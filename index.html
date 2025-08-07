@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>타이핑 연습</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .typing-area {
+            margin-bottom: 30px;
+        }
+
+        .sentence-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #333;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+        }
+
+        .current-sentence {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .input-area {
+            position: relative;
+        }
+
+        .typing-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 3px solid #e9ecef;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .typing-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .typing-input.correct {
+            border-color: #28a745;
+        }
+
+        .typing-input.incorrect {
+            border-color: #dc3545;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .accuracy-indicator {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .timer {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>타이핑 연습</h1>
+            <p>문장을 따라 타이핑하여 속도와 정확도를 향상시켜보세요!</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="wpm">0</div>
+                <div class="stat-label">WPM</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="accuracy">100%</div>
+                <div class="stat-label">정확도</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="timer">00:00</div>
+                <div class="stat-label">시간</div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+
+        <div class="typing-area">
+            <div class="sentence-display" id="sentenceDisplay">
+                타이핑을 시작하려면 아래 입력창에 타이핑하세요.
+            </div>
+            <div class="input-area">
+                <input type="text" class="typing-input" id="typingInput" placeholder="여기에 타이핑하세요..." autocomplete="off">
+                <div class="accuracy-indicator" id="accuracyIndicator"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="startBtn">시작</button>
+            <button class="btn btn-secondary" id="resetBtn">다시 시작</button>
+            <button class="btn btn-secondary" id="nextBtn">다음 문장</button>
+        </div>
+    </div>
+
+    <script>
+        const sentences = [
+            "Camels use the fat for energy.",
+            "One day, they jump out from mom's pouch.",
+            "The chameleon goes quickly to the green glass and turns green.",
+            "They sing to attract females.",
+            "Nobody knows for sure why they died out.",
+            "I look like a tiger.",
+            "I use my forked tongue to smell.",
+            "Even when we are sleeping, we are hanging upside down.",
+            "Whale can't breathe through the water.",
+            "They fly in a V-shape.",
+            "Your legs are covered with fine hair.",
+            "I am making the webs to catch bugs.",
+            "I try to reach the leaves at the top of them, so I have a long neck.",
+            "The bees started to put honey in their house.",
+            "Winter is too cold for bear to catch prey, so they have a long winter sleep.",
+            "It changes sunlight into energy.",
+            "They store lots of water in their trunks.",
+            "Spores are everywhere.",
+            "Something scary seems to happen.",
+            "It is easy for them to get dirty.",
+            "Count the tree rings on the stumps.",
+            "Each firefly sends a different signal.",
+            "The ink can also make your eyes hurt.",
+            "A wet nose helps them smell better.",
+            "She was tickling the sole of dad's foot with a brush.",
+            "It also protects your ears from loud noises.",
+            "Minhee got a tape recorder for her birthday.",
+            "Why do I burp when I drink soda?",
+            "The air pressure inside and outside your ear is not the same.",
+            "The skin (which covers your hands and feet) absorbs water well.",
+            "When you see delicious food, your mouth starts to water.",
+            "A bump appeared at once. It was very itchy.",
+            "The sun can be harmful for your skin.",
+            "You can gulp lots of fresh air when you yawn.",
+            "If you want to stop hiccuping, try to hold your breath.",
+            "Sneezing can remove germs and dust from the nose.",
+            "It delivers oxygen and nutrients to our body.",
+            "All people have different spots for sweat glands on their fingers.",
+            "Our tongue can taste sweet, salty, bitter and sour.",
+            "If our body loses its balance, the water in our ears is not calm.",
+            "Our brains sort and store information while we're sleeping.",
+            "Sometimes the gas goes up and out. It is called a burp.",
+            "Goose bumps don't let us lose our body heat.",
+            "My little teeth don't fit my mouth and jaw anymore.",
+            "What do other people think about cloning?",
+            "Your belly button is the spot where the umbilical cord used to be.",
+            "If you are color-blind, you might think that green leaves are gray.",
+            "Germs like playing in your sweaty shoes.",
+            "By the way, why do people think rumbling is a sign of hunger?",
+            "Soap bubbles like to stick together.",
+            "A kernel of corn has a little bit of water in it.",
+            "Salt lowers the freezing point of water.",
+            "The heat first divides the proteins.",
+            "Density means how close A and B are.",
+            "Microwaves go through the bread, and heat only the water in the bread.",
+            "Don't open attached files you don't know.",
+            "If the temperature gets cooler, the water in the air turns into a liquid.",
+            "The pictures pass quickly so they look like they are in motion.",
+            "A glow stick is put in a plastic tube, and in a glow stick, two kinds of liquid are in separate areas.",
+            "If you touch electrical devices with a wet hand, you may get an electric shock."
+        ];
+
+        let currentSentenceIndex = 0;
+        let startTime = null;
+        let timer = null;
+        let isTyping = false;
+        let totalWords = 0;
+        let totalTime = 0;
+        let correctWords = 0;
+
+        const sentenceDisplay = document.getElementById('sentenceDisplay');
+        const typingInput = document.getElementById('typingInput');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const wpmDisplay = document.getElementById('wpm');
+        const accuracyDisplay = document.getElementById('accuracy');
+        const timerDisplay = document.getElementById('timer');
+        const progressBar = document.getElementById('progress');
+        const accuracyIndicator = document.getElementById('accuracyIndicator');
+
+        function updateDisplay() {
+            sentenceDisplay.innerHTML = `<span class="current-sentence">${sentences[currentSentenceIndex]}</span>`;
+            progressBar.style.width = `${((currentSentenceIndex + 1) / sentences.length) * 100}%`;
+        }
+
+        function startTimer() {
+            startTime = Date.now();
+            timer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                totalTime = elapsed;
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+        }
+
+        function calculateWPM() {
+            if (totalTime === 0) return 0;
+            const minutes = totalTime / 60;
+            return Math.round(totalWords / minutes);
+        }
+
+        function calculateAccuracy() {
+            if (totalWords === 0) return 100;
+            return Math.round((correctWords / totalWords) * 100);
+        }
+
+        function updateStats() {
+            wpmDisplay.textContent = calculateWPM();
+            accuracyDisplay.textContent = `${calculateAccuracy()}%`;
+        }
+
+        function checkAccuracy(input, target) {
+            const inputWords = input.trim().split(/\s+/);
+            const targetWords = target.trim().split(/\s+/);
+            
+            let correct = 0;
+            for (let i = 0; i < Math.min(inputWords.length, targetWords.length); i++) {
+                if (inputWords[i] === targetWords[i]) {
+                    correct++;
+                }
+            }
+            
+            return {
+                correct,
+                total: targetWords.length,
+                percentage: Math.round((correct / targetWords.length) * 100)
+            };
+        }
+
+        function startTyping() {
+            isTyping = true;
+            startTimer();
+            typingInput.focus();
+            startBtn.textContent = '일시정지';
+            startBtn.classList.remove('btn-primary');
+            startBtn.classList.add('btn-secondary');
+        }
+
+        function pauseTyping() {
+            isTyping = false;
+            stopTimer();
+            startBtn.textContent = '계속';
+            startBtn.classList.remove('btn-secondary');
+            startBtn.classList.add('btn-primary');
+        }
+
+        function resetTyping() {
+            currentSentenceIndex = 0;
+            totalWords = 0;
+            totalTime = 0;
+            correctWords = 0;
+            isTyping = false;
+            stopTimer();
+            typingInput.value = '';
+            typingInput.className = 'typing-input';
+            accuracyIndicator.textContent = '';
+            timerDisplay.textContent = '00:00';
+            wpmDisplay.textContent = '0';
+            accuracyDisplay.textContent = '100%';
+            startBtn.textContent = '시작';
+            startBtn.classList.remove('btn-secondary');
+            startBtn.classList.add('btn-primary');
+            updateDisplay();
+        }
+
+        function nextSentence() {
+            if (currentSentenceIndex < sentences.length - 1) {
+                currentSentenceIndex++;
+                typingInput.value = '';
+                typingInput.className = 'typing-input';
+                accuracyIndicator.textContent = '';
+                updateDisplay();
+            } else {
+                alert('모든 문장을 완료했습니다!');
+            }
+        }
+
+        typingInput.addEventListener('input', (e) => {
+            if (!isTyping) return;
+
+            const input = e.target.value;
+            const target = sentences[currentSentenceIndex];
+            
+            if (input.length > 0) {
+                const accuracy = checkAccuracy(input, target);
+                accuracyIndicator.textContent = `정확도: ${accuracy.percentage}%`;
+                
+                if (input === target) {
+                    e.target.classList.add('correct');
+                    e.target.classList.remove('incorrect');
+                    correctWords += target.split(/\s+/).length;
+                    totalWords += target.split(/\s+/).length;
+                    updateStats();
+                    
+                    setTimeout(() => {
+                        if (currentSentenceIndex < sentences.length - 1) {
+                            nextSentence();
+                        } else {
+                            alert('축하합니다! 모든 문장을 완료했습니다!');
+                            pauseTyping();
+                        }
+                    }, 500);
+                } else if (target.startsWith(input)) {
+                    e.target.classList.remove('incorrect');
+                    e.target.classList.remove('correct');
+                } else {
+                    e.target.classList.add('incorrect');
+                    e.target.classList.remove('correct');
+                }
+            } else {
+                e.target.classList.remove('correct', 'incorrect');
+                accuracyIndicator.textContent = '';
+            }
+        });
+
+        startBtn.addEventListener('click', () => {
+            if (isTyping) {
+                pauseTyping();
+            } else {
+                startTyping();
+            }
+        });
+
+        resetBtn.addEventListener('click', resetTyping);
+        nextBtn.addEventListener('click', nextSentence);
+
+        // 초기 표시
+        updateDisplay();
+    </script>
+</body>
+</html> 
