@@ -3,7 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>타이핑 연습</title>
+    <meta name="description" content="무료 온라인 타이핑 연습 사이트 - 영어와 한글 타이핑 속도와 정확도를 향상시키세요. 실시간 WPM과 정확도 측정.">
+    <meta name="keywords" content="타이핑 연습, 타자 연습, 영어 타이핑, 타이핑 게임, WPM, 타자 속도, 타자 정확도">
+    <meta name="author" content="typingbook.com">
+    <meta property="og:title" content="타이핑 연습 - typingbook.com">
+    <meta property="og:description" content="무료 온라인 타이핑 연습 사이트 - 영어와 한글 타이핑 속도와 정확도를 향상시키세요.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.typingbook.com">
+    <title>타이핑 연습 - typingbook.com | 무료 온라인 타자 연습</title>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    
+    <!-- Google AdSense -->
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+        crossorigin="anonymous"></script> -->
     <style>
         * {
             margin: 0;
@@ -16,9 +36,81 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
+            padding: 0;
+            margin: 0;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .nav-logo a {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 0;
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #667eea;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            transform: scaleX(1);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
         .container {
@@ -28,6 +120,55 @@
             padding: 40px;
             max-width: 800px;
             width: 100%;
+        }
+
+        .category-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .category-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .category-card p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .category-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .typing-area {
+            display: none;
+        }
+
+        .typing-area.active {
+            display: block;
         }
 
         .header {
@@ -189,7 +330,29 @@
             margin-bottom: 20px;
         }
 
+        .ad-container {
+            max-width: 800px;
+            margin: 20px auto;
+            text-align: center;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .top-ad {
+            margin-bottom: 30px;
+        }
+
+        .bottom-ad {
+            margin-top: 30px;
+        }
+
         @media (max-width: 768px) {
+            main {
+                padding: 20px 10px;
+            }
+
             .container {
                 padding: 20px;
             }
@@ -206,17 +369,199 @@
             .controls {
                 flex-direction: column;
             }
+
+            .ad-container {
+                margin: 15px;
+                padding: 10px;
+            }
+
+            .nav-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 30px;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+
+            .typing-input {
+                font-size: 1rem;
+                padding: 12px 15px;
+            }
+
+            .sentence-display {
+                font-size: 1.1rem;
+                padding: 15px;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .typing-input {
+                font-size: 0.9rem;
+                padding: 10px;
+            }
+
+            .sentence-display {
+                font-size: 1rem;
+                padding: 12px;
+                min-height: 60px;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            .stat-value {
+                font-size: 1.3rem;
+            }
+
+            .stat-label {
+                font-size: 0.8rem;
+            }
+        }
+        
+
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 60px 0 20px;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            padding: 0 20px;
+        }
+
+        .footer-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .footer-section p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul a:hover {
+            color: #667eea;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: #667eea;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .footer-bottom p {
+            color: #666;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-logo">
+                <a href="/">타이핑북</a>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="active">타이핑 연습</a>
+                <a href="guide.html">사용 가이드</a>
+                <a href="stats.html">나의 통계</a>
+                <a href="contact.html">문의하기</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 상단 광고 -->
+    <!-- <main>
+        <div class="ad-container top-ad">
+            <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                data-ad-slot="XXXXXXXXXX"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div> -->
+    <main>
+
+        <div class="container">
         <div class="header">
             <h1>타이핑 연습</h1>
             <p>문장을 따라 타이핑하여 속도와 정확도를 향상시켜보세요!</p>
         </div>
 
-        <div class="stats">
+        <div class="category-menu" id="categoryMenu">
+            <!-- 카테고리 카드들이 여기에 동적으로 추가됩니다 -->
+        </div>
+
+        <div class="typing-area" id="typingArea">
+            <div class="stats">
             <div class="stat">
                 <div class="stat-value" id="wpm">0</div>
                 <div class="stat-label">WPM</div>
@@ -250,10 +595,58 @@
             <button class="btn btn-secondary" id="resetBtn">다시 시작</button>
             <button class="btn btn-secondary" id="nextBtn">다음 문장</button>
         </div>
+
+        <!-- 하단 광고 -->
+        <!-- <div class="ad-container bottom-ad">
+            <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                data-ad-slot="XXXXXXXXXX"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div> -->
     </div>
 
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>타이핑북 소개</h3>
+                <p>타이핑북은 무료 온라인 타이핑 연습 사이트입니다. 영어와 한글 타이핑 실력을 향상시키고 싶은 모든 분들을 위해 제공됩니다.</p>
+            </div>
+            <div class="footer-section">
+                <h3>빠른 링크</h3>
+                <ul>
+                    <li><a href="/guide">사용 가이드</a></li>
+                    <li><a href="/stats">나의 통계</a></li>
+                    <li><a href="/contact">문의하기</a></li>
+                    <li><a href="/privacy">개인정보처리방침</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>문의하기</h3>
+                <p>이메일: contact@typingbook.com</p>
+                <div class="social-links">
+                    <a href="#" target="_blank">Facebook</a>
+                    <a href="#" target="_blank">Twitter</a>
+                    <a href="#" target="_blank">Instagram</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 타이핑북. All rights reserved.</p>
+        </div>
+    </footer>
+
     <script>
-        const sentences = [
+        const sentenceCategories = {
+            middleRow: {
+                name: "중간 행 키보드 연습",
+                description: "중간 행 키보드 자판 연습을 위한 문장들",
+                sentences: [
+            //middle row keyboard
  "Dad had a gala in a hall.",
 "Sally adds salad for a lad.",
 "Hal has a flask for gala.",
@@ -303,7 +696,13 @@
 "Gala had salad at dawn.",
 "Hal adds salt to salad.",
 "Sally had gala for Dad.",
-"Dad had gala with lads.",
+"Dad had gala with lads."
+                ]
+            },
+            topRow: {
+                name: "상단 행 키보드 연습",
+                description: "상단 행 키보드 자판 연습을 위한 문장들",
+                sentences: [
 "Peter had a salad for lunch.",
 "Julia will type fast for class.",
 "Fred kept all quiet in hall.",
@@ -353,7 +752,13 @@
 "Tim read the gala notes.",
 "Kate kept all the maps safe.",
 "Fred read the gala speech.",
-"Julie typed all the data.",
+"Julie typed all the data."
+                ]
+            },
+            bottomRow: {
+                name: "하단 행 키보드 연습",
+                description: "하단 행 키보드 자판 연습을 위한 문장들",
+                sentences: [
             "Max had a salad at noon.",
 "Sam will bake muffins today.",
 "Ben fixed a small lamp.",
@@ -403,7 +808,13 @@
 "Zack made a muffin tray.",
 "Max was calm with Sam.",
 "Sam baked jam muffins.",
-"Ben had milk with cake.",
+"Ben had milk with cake."
+                ]
+            },
+            realEnglish: {
+                name: "실제 영어 문장 연습",
+                description: "실제 상황에서 사용되는 영어 문장들",
+                sentences: [
             "Camels use the fat for energy.",
             "One day, they jump out from mom's pouch.",
             "The chameleon goes quickly to the green glass and turns green.",
@@ -464,8 +875,11 @@
             "The pictures pass quickly so they look like they are in motion.",
             "A glow stick is put in a plastic tube, and in a glow stick, two kinds of liquid are in separate areas.",
             "If you touch electrical devices with a wet hand, you may get an electric shock."
-        ];
+                ]
+            }
+        };
 
+        let currentCategory = null;
         let currentSentenceIndex = 0;
         let startTime = null;
         let timer = null;
@@ -473,6 +887,56 @@
         let totalWords = 0;
         let totalTime = 0;
         let correctWords = 0;
+        let errorWords = [];
+        let sessionErrors = [];
+        
+        // 카테고리 메뉴 초기화
+        function initializeCategoryMenu() {
+            const categoryMenu = document.getElementById('categoryMenu');
+            const typingArea = document.getElementById('typingArea');
+            
+            Object.entries(sentenceCategories).forEach(([key, category]) => {
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                card.innerHTML = `
+                    <h3>${category.name}</h3>
+                    <p>${category.description}</p>
+                    <div class="category-stats">
+                        <span>${category.sentences.length} 문장</span>
+                        <span>난이도: ${getDifficulty(category.sentences)}</span>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    currentCategory = key;
+                    currentSentenceIndex = 0;
+                    resetTyping();
+                    categoryMenu.style.display = 'none';
+                    typingArea.classList.add('active');
+                    updateDisplay();
+                });
+                
+                categoryMenu.appendChild(card);
+            });
+        }
+        
+        // 카테고리의 난이도 계산
+        function getDifficulty(sentences) {
+            const avgLength = sentences.reduce((sum, sent) => sum + sent.length, 0) / sentences.length;
+            if (avgLength < 30) return '쉬움';
+            if (avgLength < 50) return '보통';
+            return '어려움';
+        }
+        
+        // 타이핑 영역으로 돌아가기
+        function backToMenu() {
+            const categoryMenu = document.getElementById('categoryMenu');
+            const typingArea = document.getElementById('typingArea');
+            
+            categoryMenu.style.display = 'grid';
+            typingArea.classList.remove('active');
+            resetTyping();
+        }
 
         const sentenceDisplay = document.getElementById('sentenceDisplay');
         const typingInput = document.getElementById('typingInput');
@@ -486,8 +950,10 @@
         const accuracyIndicator = document.getElementById('accuracyIndicator');
 
         function updateDisplay() {
-            sentenceDisplay.innerHTML = `<span class="current-sentence">${sentences[currentSentenceIndex]}</span>`;
-            progressBar.style.width = `${((currentSentenceIndex + 1) / sentences.length) * 100}%`;
+            if (!currentCategory) return;
+            const currentSentences = sentenceCategories[currentCategory].sentences;
+            sentenceDisplay.innerHTML = `<span class="current-sentence">${currentSentences[currentSentenceIndex]}</span>`;
+            progressBar.style.width = `${((currentSentenceIndex + 1) / currentSentences.length) * 100}%`;
         }
 
         function startTimer() {
@@ -564,6 +1030,8 @@
             totalWords = 0;
             totalTime = 0;
             correctWords = 0;
+            errorWords = [];
+            sessionErrors = [];
             isTyping = false;
             stopTimer();
             typingInput.value = '';
@@ -579,7 +1047,8 @@
         }
 
         function nextSentence() {
-            if (currentSentenceIndex < sentences.length - 1) {
+            if (!currentCategory) return;
+            if (currentSentenceIndex < sentenceCategories[currentCategory].sentences.length - 1) {
                 currentSentenceIndex++;
                 typingInput.value = '';
                 typingInput.className = 'typing-input';
@@ -590,15 +1059,50 @@
             }
         }
 
+        // 세션 통계 저장
+        function saveSessionStats() {
+            const sessionData = {
+                date: new Date().toISOString(),
+                category: currentCategory,
+                wpm: calculateWPM(),
+                accuracy: calculateAccuracy(),
+                totalWords: totalWords,
+                totalErrors: sessionErrors.length,
+                errorWords: sessionErrors,
+                duration: totalTime
+            };
+
+            const existingStats = localStorage.getItem('typingStats');
+            const stats = existingStats ? JSON.parse(existingStats) : [];
+            stats.push(sessionData);
+            localStorage.setItem('typingStats', JSON.stringify(stats));
+        }
+
         typingInput.addEventListener('input', (e) => {
-            if (!isTyping) return;
+            if (!isTyping || !currentCategory) return;
 
             const input = e.target.value;
-            const target = sentences[currentSentenceIndex];
+            const target = sentenceCategories[currentCategory].sentences[currentSentenceIndex];
             
             if (input.length > 0) {
                 const accuracy = checkAccuracy(input, target);
                 accuracyIndicator.textContent = `정확도: ${accuracy.percentage}%`;
+                
+                // 오타 추적
+                if (input.length > 0 && !target.startsWith(input)) {
+                    const currentWord = input.split(' ').pop();
+                    const targetWord = target.split(' ')[input.split(' ').length - 1];
+                    if (currentWord && targetWord && currentWord !== targetWord) {
+                        const error = {
+                            word: targetWord,
+                            typed: currentWord,
+                            timestamp: Date.now()
+                        };
+                        if (!sessionErrors.find(e => e.word === targetWord && e.typed === currentWord)) {
+                            sessionErrors.push(error);
+                        }
+                    }
+                }
                 
                 if (input === target) {
                     e.target.classList.add('correct');
@@ -608,9 +1112,10 @@
                     updateStats();
                     
                     setTimeout(() => {
-                        if (currentSentenceIndex < sentences.length - 1) {
+                        if (currentSentenceIndex < sentenceCategories[currentCategory].sentences.length - 1) {
                             nextSentence();
                         } else {
+                            saveSessionStats();
                             alert('축하합니다! 모든 문장을 완료했습니다!');
                             pauseTyping();
                         }
@@ -639,8 +1144,16 @@
         resetBtn.addEventListener('click', resetTyping);
         nextBtn.addEventListener('click', nextSentence);
 
-        // 초기 표시
-        updateDisplay();
+        // 메뉴에 돌아가기 버튼 추가
+        const backButton = document.createElement('button');
+        backButton.className = 'btn btn-secondary';
+        backButton.textContent = '메뉴로 돌아가기';
+        backButton.style.marginRight = '10px';
+        backButton.addEventListener('click', backToMenu);
+        document.querySelector('.controls').insertBefore(backButton, startBtn);
+
+        // 초기화
+        initializeCategoryMenu();
     </script>
 </body>
 </html> 

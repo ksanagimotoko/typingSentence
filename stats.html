@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="타이핑북 사용자 통계 - 타이핑 속도와 오타 분석">
+    <meta name="keywords" content="타이핑 통계, 타자 속도, 오타 분석, WPM 그래프">
+    <meta name="author" content="typingbook.com">
+    <meta property="og:title" content="나의 통계 - typingbook.com">
+    <meta property="og:description" content="타이핑 속도와 오타 분석을 통한 실력 향상 추적">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.typingbook.com/stats">
+    <title>나의 통계 - typingbook.com | 타이핑 실력 분석</title>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    
+    <!-- Google AdSense -->
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+        crossorigin="anonymous"></script> -->
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            margin: 0;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .nav-logo a {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 0;
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #667eea;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            transform: scaleX(1);
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .stats-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .stats-header h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .stats-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .stats-content {
+            padding: 60px 40px;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            border-left: 5px solid #667eea;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .chart-section {
+            margin-bottom: 60px;
+        }
+
+        .chart-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .error-analysis {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .error-category {
+            margin-bottom: 30px;
+        }
+
+        .error-category h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .error-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .error-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .error-word {
+            font-weight: bold;
+            color: #dc3545;
+            margin-bottom: 5px;
+        }
+
+        .error-count {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .no-data h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .no-data p {
+            margin-bottom: 30px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .ad-container {
+            max-width: 800px;
+            margin: 20px auto;
+            text-align: center;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 60px 0 20px;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            padding: 0 20px;
+        }
+
+        .footer-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .footer-section p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul a:hover {
+            color: #667eea;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: #667eea;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .footer-bottom p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .stats-header {
+                padding: 40px 20px;
+            }
+
+            .stats-header h1 {
+                font-size: 2rem;
+            }
+
+            .stats-content {
+                padding: 40px 20px;
+            }
+
+            .nav-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 30px;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+
+            .stats-overview {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-logo">
+                <a href="index.html">타이핑북</a>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">타이핑 연습</a>
+                <a href="guide.html">사용 가이드</a>
+                <a href="stats.html" class="active">나의 통계</a>
+                <a href="contact.html">문의하기</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 상단 광고 -->
+    <div class="ad-container">
+        <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+            data-ad-slot="XXXXXXXXXX"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+
+    <main>
+        <div class="container">
+            <div class="stats-header">
+                <h1>나의 타이핑 통계</h1>
+                <p>타이핑 실력 향상을 위한 상세한 분석</p>
+            </div>
+
+            <div class="stats-content" id="statsContent">
+                <!-- 통계 내용이 여기에 동적으로 로드됩니다 -->
+            </div>
+        </div>
+    </main>
+
+    <!-- 하단 광고 -->
+    <div class="ad-container">
+        <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+            data-ad-slot="XXXXXXXXXX"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>타이핑북 소개</h3>
+                <p>타이핑북은 무료 온라인 타이핑 연습 사이트입니다. 영어와 한글 타이핑 실력을 향상시키고 싶은 모든 분들을 위해 제공됩니다.</p>
+            </div>
+            <div class="footer-section">
+                <h3>빠른 링크</h3>
+                <ul>
+                    <li><a href="guide.html">사용 가이드</a></li>
+                    <li><a href="stats.html">나의 통계</a></li>
+                    <li><a href="/contact">문의하기</a></li>
+                    <li><a href="/privacy">개인정보처리방침</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>문의하기</h3>
+                <p>이메일: contact@typingbook.com</p>
+                <div class="social-links">
+                    <a href="#" target="_blank">Facebook</a>
+                    <a href="#" target="_blank">Twitter</a>
+                    <a href="#" target="_blank">Instagram</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 타이핑북. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // 로컬 스토리지에서 데이터 로드
+        function loadStatsData() {
+            const statsData = localStorage.getItem('typingStats');
+            return statsData ? JSON.parse(statsData) : null;
+        }
+
+        // 통계 데이터 분석
+        function analyzeStats(data) {
+            if (!data || data.length === 0) {
+                return null;
+            }
+
+            const analysis = {
+                totalSessions: data.length,
+                averageWPM: 0,
+                bestWPM: 0,
+                averageAccuracy: 0,
+                totalWords: 0,
+                totalErrors: 0,
+                errorWords: {},
+                speedHistory: [],
+                categoryStats: {}
+            };
+
+            let totalWPM = 0;
+            let totalAccuracy = 0;
+
+            data.forEach(session => {
+                // WPM 통계
+                totalWPM += session.wpm || 0;
+                if (session.wpm > analysis.bestWPM) {
+                    analysis.bestWPM = session.wpm;
+                }
+
+                // 정확도 통계
+                totalAccuracy += session.accuracy || 0;
+
+                // 단어 수 및 오류 수
+                analysis.totalWords += session.totalWords || 0;
+                analysis.totalErrors += session.totalErrors || 0;
+
+                // 속도 히스토리
+                if (session.wpm) {
+                    analysis.speedHistory.push({
+                        date: session.date,
+                        wpm: session.wpm,
+                        category: session.category
+                    });
+                }
+
+                // 카테고리별 통계
+                if (session.category) {
+                    if (!analysis.categoryStats[session.category]) {
+                        analysis.categoryStats[session.category] = {
+                            sessions: 0,
+                            totalWPM: 0,
+                            bestWPM: 0
+                        };
+                    }
+                    analysis.categoryStats[session.category].sessions++;
+                    analysis.categoryStats[session.category].totalWPM += session.wpm || 0;
+                    if (session.wpm > analysis.categoryStats[session.category].bestWPM) {
+                        analysis.categoryStats[session.category].bestWPM = session.wpm;
+                    }
+                }
+
+                // 오류 단어 분석
+                if (session.errorWords) {
+                    session.errorWords.forEach(error => {
+                        if (!analysis.errorWords[error.word]) {
+                            analysis.errorWords[error.word] = 0;
+                        }
+                        analysis.errorWords[error.word]++;
+                    });
+                }
+            });
+
+            analysis.averageWPM = Math.round(totalWPM / data.length);
+            analysis.averageAccuracy = Math.round(totalAccuracy / data.length);
+
+            return analysis;
+        }
+
+        // 속도 그래프 생성
+        function createSpeedChart(speedHistory) {
+            const ctx = document.getElementById('speedChart').getContext('2d');
+            
+            const labels = speedHistory.map(item => {
+                const date = new Date(item.date);
+                return `${date.getMonth() + 1}/${date.getDate()}`;
+            });
+
+            const data = speedHistory.map(item => item.wpm);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'WPM',
+                        data: data,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'WPM (분당 단어 수)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '날짜'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 오류 분석 표시
+        function displayErrorAnalysis(errorWords) {
+            const errorList = document.getElementById('errorList');
+            const sortedErrors = Object.entries(errorWords)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 10); // 상위 10개만 표시
+
+            if (sortedErrors.length === 0) {
+                errorList.innerHTML = '<p>아직 오류 데이터가 없습니다.</p>';
+                return;
+            }
+
+            errorList.innerHTML = sortedErrors.map(([word, count]) => `
+                <div class="error-item">
+                    <div class="error-word">${word}</div>
+                    <div class="error-count">${count}회 오타</div>
+                </div>
+            `).join('');
+        }
+
+        // 통계 페이지 렌더링
+        function renderStatsPage() {
+            const statsContent = document.getElementById('statsContent');
+            const data = loadStatsData();
+            const analysis = analyzeStats(data);
+
+            if (!analysis) {
+                statsContent.innerHTML = `
+                    <div class="no-data">
+                        <h3>아직 통계 데이터가 없습니다</h3>
+                        <p>타이핑 연습을 시작하여 나의 실력을 추적해보세요!</p>
+                        <a href="index.html" class="cta-button">타이핑 연습 시작하기</a>
+                    </div>
+                `;
+                return;
+            }
+
+            statsContent.innerHTML = `
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <div class="stat-value">${analysis.averageWPM}</div>
+                        <div class="stat-label">평균 WPM</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${analysis.bestWPM}</div>
+                        <div class="stat-label">최고 WPM</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${analysis.averageAccuracy}%</div>
+                        <div class="stat-label">평균 정확도</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${analysis.totalSessions}</div>
+                        <div class="stat-label">총 연습 횟수</div>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <div class="chart-icon">📈</div>
+                            타이핑 속도 변화
+                        </div>
+                        <canvas id="speedChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+
+                <div class="error-analysis">
+                    <div class="error-category">
+                        <h3>🔍 자주 틀리는 단어 분석</h3>
+                        <div class="error-list" id="errorList">
+                            <!-- 오류 분석이 여기에 표시됩니다 -->
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 그래프 생성
+            if (analysis.speedHistory.length > 0) {
+                createSpeedChart(analysis.speedHistory);
+            }
+
+            // 오류 분석 표시
+            displayErrorAnalysis(analysis.errorWords);
+        }
+
+        // 페이지 로드 시 통계 렌더링
+        document.addEventListener('DOMContentLoaded', renderStatsPage);
+    </script>
+</body>
+</html> 

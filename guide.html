@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="타이핑북 사용 가이드 - 효과적인 타이핑 연습 방법과 단계별 학습 가이드">
+    <meta name="keywords" content="타이핑 가이드, 타자 연습 방법, 키보드 학습, 단계별 타이핑">
+    <meta name="author" content="typingbook.com">
+    <meta property="og:title" content="사용 가이드 - typingbook.com">
+    <meta property="og:description" content="효과적인 타이핑 연습을 위한 단계별 학습 가이드">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.typingbook.com/guide">
+    <title>사용 가이드 - typingbook.com | 효과적인 타이핑 학습법</title>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    
+    <!-- Google AdSense -->
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+        crossorigin="anonymous"></script> -->
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            margin: 0;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .nav-logo a {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 0;
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #667eea;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            transform: scaleX(1);
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .guide-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .guide-header h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .guide-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .guide-content {
+            padding: 60px 40px;
+        }
+
+        .guide-section {
+            margin-bottom: 60px;
+        }
+
+        .guide-section h2 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .step-container {
+            display: grid;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .step-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .step-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .step-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .step-tips {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .step-tips h4 {
+            color: #17a2b8;
+            margin-bottom: 10px;
+        }
+
+        .step-tips ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .step-tips li {
+            color: #666;
+            margin-bottom: 5px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .step-tips li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #17a2b8;
+            font-weight: bold;
+        }
+
+        .keyboard-layout {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .keyboard-row {
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+
+        .highlighted-keys {
+            background: #667eea;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin: 0 2px;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: 15px;
+            margin-top: 40px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .ad-container {
+            max-width: 800px;
+            margin: 20px auto;
+            text-align: center;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 60px 0 20px;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            padding: 0 20px;
+        }
+
+        .footer-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .footer-section p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul a:hover {
+            color: #667eea;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: #667eea;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .footer-bottom p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .guide-header {
+                padding: 40px 20px;
+            }
+
+            .guide-header h1 {
+                font-size: 2rem;
+            }
+
+            .guide-content {
+                padding: 40px 20px;
+            }
+
+            .nav-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 30px;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-logo">
+                <a href="index.html">타이핑북</a>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">타이핑 연습</a>
+                <a href="guide.html" class="active">사용 가이드</a>
+                <a href="stats.html">나의 통계</a>
+                <a href="contact.html">문의하기</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 상단 광고 -->
+    <!-- <div class="ad-container">
+        <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+            data-ad-slot="XXXXXXXXXX"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div> -->
+
+    <main>
+        <div class="container">
+            <div class="guide-header">
+                <h1>타이핑 연습 가이드</h1>
+                <p>체계적인 단계별 학습으로 타이핑 실력을 향상시켜보세요</p>
+            </div>
+
+            <div class="guide-content">
+                <div class="guide-section">
+                    <h2>
+                        <div class="section-icon">🎯</div>
+                        체계적인 단계별 학습 시스템
+                    </h2>
+                    <p style="color: #666; font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px;">
+                        타이핑북은 키보드의 각 행을 순차적으로 마스터할 수 있도록 과학적으로 설계된 커리큘럼을 제공합니다. 
+                        각 단계는 이전 단계의 기초 위에 구축되어, 효율적이고 체계적인 학습이 가능합니다.
+                    </p>
+
+                    <div class="keyboard-layout">
+                        <h3 style="margin-bottom: 20px;">키보드 배치도</h3>
+                        <div class="keyboard-row">
+                            <span class="highlighted-keys">Q W E R T Y U I O P</span> ← 상단 행
+                        </div>
+                        <div class="keyboard-row">
+                            <span class="highlighted-keys">A S D F G H J K L</span> ← 중간 행 (홈 포지션)
+                        </div>
+                        <div class="keyboard-row">
+                            <span class="highlighted-keys">Z X C V B N M</span> ← 하단 행
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <div class="step-card">
+                            <div class="step-number">1</div>
+                            <div class="step-title">🏠 중간 행 키보드 연습 (홈 포지션)</div>
+                            <div class="step-description">
+                                타이핑의 기초가 되는 홈 포지션(A S D F G H J K L)을 완전히 마스터하는 단계입니다. 
+                                모든 손가락이 올바른 위치에서 시작하고 돌아올 수 있도록 연습합니다.
+                            </div>
+                            <div class="step-tips">
+                                <h4>💡 학습 포인트</h4>
+                                <ul>
+                                    <li>왼손: A(새끼), S(약지), D(중지), F(검지)</li>
+                                    <li>오른손: J(검지), K(중지), L(약지), ;(새끼)</li>
+                                    <li>G와 H는 검지손가락이 담당</li>
+                                    <li>각 손가락은 정해진 키만 타이핑</li>
+                                    <li>타이핑 후 반드시 홈 포지션으로 복귀</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <div class="step-number">2</div>
+                            <div class="step-title">⬆️ 상단 행 키보드 연습</div>
+                            <div class="step-description">
+                                홈 포지션을 기반으로 상단 행(Q W E R T Y U I O P)을 학습합니다. 
+                                각 손가락이 상단으로 뻗어 올라간 후 정확히 홈 포지션으로 돌아오는 것이 핵심입니다.
+                            </div>
+                            <div class="step-tips">
+                                <h4>💡 학습 포인트</h4>
+                                <ul>
+                                    <li>손가락을 위로 뻗되 손목은 고정</li>
+                                    <li>Q, W는 왼손 새끼, 약지가 담당</li>
+                                    <li>E, R, T는 왼손 중지, 검지가 담당</li>
+                                    <li>Y, U, I, O, P는 오른손이 담당</li>
+                                    <li>타이핑 후 즉시 홈 포지션 복귀</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <div class="step-number">3</div>
+                            <div class="step-title">⬇️ 하단 행 키보드 연습</div>
+                            <div class="step-description">
+                                마지막으로 하단 행(Z X C V B N M)을 마스터합니다. 
+                                상단과 중간 행을 완벽히 익힌 상태에서 하단 행까지 정복하면 모든 알파벳을 자유자재로 타이핑할 수 있습니다.
+                            </div>
+                            <div class="step-tips">
+                                <h4>💡 학습 포인트</h4>
+                                <ul>
+                                    <li>손가락을 아래로 뻗되 손목은 안정적으로 유지</li>
+                                    <li>Z, X는 왼손 새끼, 약지가 담당</li>
+                                    <li>C, V는 왼손 중지, 검지가 담당</li>
+                                    <li>B, N, M은 오른손이 담당</li>
+                                    <li>모든 타이핑 후 홈 포지션으로 정확히 복귀</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <div class="step-number">4</div>
+                            <div class="step-title">🌟 실제 영어 문장 연습</div>
+                            <div class="step-description">
+                                모든 키보드 행을 마스터한 후, 실제 상황에서 사용되는 영어 문장들로 종합적인 타이핑 실력을 완성합니다. 
+                                단어 조합, 문장 구조, 특수문자까지 포함된 실전 연습입니다.
+                            </div>
+                            <div class="step-tips">
+                                <h4>💡 학습 포인트</h4>
+                                <ul>
+                                    <li>자연스러운 문장 흐름에 맞춘 타이핑</li>
+                                    <li>대소문자, 구두점, 숫자 포함</li>
+                                    <li>일상생활과 업무에서 자주 사용되는 표현</li>
+                                    <li>속도와 정확도의 균형 잡힌 발전</li>
+                                    <li>리듬감 있는 타이핑 습관 형성</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="guide-section">
+                    <h2>
+                        <div class="section-icon">📈</div>
+                        효과적인 학습 방법
+                    </h2>
+                    
+                    <div class="step-container">
+                        <div class="step-card">
+                            <div class="step-title">⏰ 꾸준한 연습이 핵심</div>
+                            <div class="step-description">
+                                하루 15-30분씩 꾸준히 연습하는 것이 한 번에 몇 시간 연습하는 것보다 효과적입니다. 
+                                근육 기억을 형성하는 데 시간이 필요하기 때문입니다.
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <div class="step-title">🎯 정확도 우선, 속도는 나중에</div>
+                            <div class="step-description">
+                                빠른 타이핑보다 정확한 타이핑을 먼저 익히세요. 
+                                잘못된 습관은 나중에 고치기 어렵습니다. 정확도 95% 이상을 목표로 하세요.
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <div class="step-title">👀 화면을 보며 타이핑</div>
+                            <div class="step-description">
+                                키보드를 보지 말고 화면의 텍스트를 보며 타이핑하세요. 
+                                손가락 위치를 외우는 것이 목표입니다.
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <div class="step-title">🔄 단계별 순차 학습</div>
+                            <div class="step-description">
+                                반드시 중간 행 → 상단 행 → 하단 행 → 실제 문장 순서로 학습하세요. 
+                                각 단계를 완전히 마스터한 후 다음 단계로 진행하는 것이 중요합니다.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cta-section">
+                    <h2 style="margin-bottom: 15px; color: white;">지금 바로 시작해보세요!</h2>
+                    <p style="opacity: 0.9;">체계적인 단계별 학습으로 타이핑 마스터가 되어보세요</p>
+                    <a href="index.html" class="cta-button">타이핑 연습 시작하기</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 하단 광고 -->
+    <!-- <div class="ad-container">
+        <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+            data-ad-slot="XXXXXXXXXX"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div> -->
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>타이핑북 소개</h3>
+                <p>타이핑북은 무료 온라인 타이핑 연습 사이트입니다. 영어와 한글 타이핑 실력을 향상시키고 싶은 모든 분들을 위해 제공됩니다.</p>
+            </div>
+            <div class="footer-section">
+                <h3>빠른 링크</h3>
+                <ul>
+                    <li><a href="/guide">사용 가이드</a></li>
+                    <li><a href="/stats">나의 통계</a></li>
+                    <li><a href="/contact">문의하기</a></li>
+                    <li><a href="/privacy">개인정보처리방침</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>문의하기</h3>
+                <p>이메일: contact@typingbook.com</p>
+                <div class="social-links">
+                    <a href="#" target="_blank">Facebook</a>
+                    <a href="#" target="_blank">Twitter</a>
+                    <a href="#" target="_blank">Instagram</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 타이핑북. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
