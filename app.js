@@ -1039,35 +1039,44 @@ function getCategoryIcon(key, level) {
 } 
 
 function getKeyboardSVG(highlight = 'middle') {
-    // rows: top, middle, bottom
+    // rows: top, middle, bottom (10 keys each)
     const baseKey = (x, y, w, h, fill) => `<rect x="${x}" y="${y}" rx="3" ry="3" width="${w}" height="${h}" fill="${fill}" stroke="#bbb"/>`;
-    const row = (y, color) => {
+    const w = 16, h = 12, gap = 4;
+    const colNormal = '#eee';
+    const colHL = '#cde4ff';
+
+    const renderRow = (rowIndex, y) => {
         const keys = [];
-        const w = 16, h = 12, gap = 4;
         for (let i = 0; i < 10; i++) {
             const x = 4 + i * (w + gap);
-            keys.push(baseKey(x, y, w, h, color));
+            let fill = colNormal;
+            if (highlight === 'top' && rowIndex === 0) fill = colHL;
+            if (highlight === 'middle' && rowIndex === 1) fill = colHL;
+            if (highlight === 'middleAlt' && rowIndex === 1 && (i % 2 === 0)) fill = colHL; // 띄엄띄엄 하이라이트
+            if (highlight === 'bottom' && rowIndex === 2) fill = colHL;
+            if (highlight === 'left' && i < 5) fill = colHL;
+            if (highlight === 'right' && i >= 5) fill = colHL;
+            keys.push(baseKey(x, y, w, h, fill));
         }
         return keys.join('');
     };
-    const colNormal = '#eee';
-    const colHL = '#cde4ff';
-    const colTop = highlight === 'top' ? colHL : colNormal;
-    const colMid = highlight === 'middle' ? colHL : colNormal;
-    const colBot = highlight === 'bottom' ? colHL : colNormal;
+
     return `
 <svg viewBox="0 0 190 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
   <rect x="1" y="1" width="188" height="58" rx="6" ry="6" fill="#f7f7f7" stroke="#ddd"/>
-  ${row(10, colTop)}
-  ${row(26, colMid)}
-  ${row(42, colBot)}
+  ${renderRow(0, 10)}
+  ${renderRow(1, 26)}
+  ${renderRow(2, 42)}
 </svg>`;
 }
 
 function getHighlightForCategory(key) {
     if (key === 'topRow') return 'top';
-    if (key === 'middleRow' || key === 'middleRowLetters') return 'middle';
+    if (key === 'middleRow') return 'middle';
+    if (key === 'middleRowLetters') return 'middleAlt';
     if (key === 'bottomRow') return 'bottom';
-    // 손 연습은 중간행 기준, 실전은 하이라이트 없음
+    if (key === 'leftHand') return 'left';
+    if (key === 'rightHand') return 'right';
+    // 실전은 하이라이트 없음
     return 'none';
 } 
