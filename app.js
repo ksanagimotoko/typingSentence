@@ -664,6 +664,25 @@ function showEncourage(kind = 'general') {
     encourageEl.classList.add('fade-in');
 }
 
+function ensureQuizPanel() {
+    let panel = document.getElementById('quizPanel');
+    if (!panel) {
+        panel = document.createElement('div');
+        panel.id = 'quizPanel';
+        panel.style.marginTop = '8px';
+        const anchor = document.getElementById('encourageMessage');
+        if (anchor && anchor.parentElement) {
+            anchor.parentElement.insertBefore(panel, anchor);
+            panel.appendChild(anchor);
+        } else if (sentenceDisplay && sentenceDisplay.parentElement) {
+            sentenceDisplay.parentElement.appendChild(panel);
+        } else {
+            document.body.appendChild(panel);
+        }
+    }
+    return panel;
+}
+
 function renderSentenceHighlight(target, input) {
     if (!sentenceDisplay) return;
     const escape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -988,7 +1007,8 @@ function showMovieChoicesAtIndex(index) {
         wrap.appendChild(btn);
     });
 
-    sentenceDisplay.appendChild(wrap);
+    const panel = ensureQuizPanel();
+    panel.appendChild(wrap);
     movieChoicesActive = true;
     focusTypingInput();
 }
@@ -1033,12 +1053,8 @@ function verifyMovieAnswer(index, selectedIdx) {
     feed.style.fontSize = '0.95rem';
     feed.style.opacity = '0';
     feed.style.transition = 'opacity 200ms ease';
-    const anchor = document.getElementById('encourageMessage');
-    if (anchor) {
-        anchor.insertAdjacentElement('afterend', feed);
-    } else {
-        sentenceDisplay.appendChild(feed);
-    }
+    const panel = ensureQuizPanel();
+    panel.appendChild(feed);
     requestAnimationFrame(() => { feed.style.opacity = '1'; });
 
     // 다음 진행 안내
@@ -1115,12 +1131,8 @@ function askContinueOrExit() {
 
     wrap.appendChild(continueBtn);
     wrap.appendChild(exitBtn);
-    const anchorForBtns = document.getElementById('encourageMessage');
-    if (anchorForBtns) {
-        anchorForBtns.insertAdjacentElement('afterend', wrap);
-    } else {
-        sentenceDisplay.appendChild(wrap);
-    }
+    const panel = ensureQuizPanel();
+    panel.appendChild(wrap);
 }
 // 번호키로 보기 선택 핸들러 등록
 window.addEventListener('keydown', onMovieNumberKey);
