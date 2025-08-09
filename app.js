@@ -493,44 +493,83 @@ const remainingInfo = document.getElementById('remainingInfo');
 const levelBadge = document.getElementById('levelBadge');
 const toastEl = document.getElementById('toast');
 const asciiRunnerEl = document.getElementById('asciiRunner');
-const asciiRunnerFrames = [
-`  >>\_
- (o )\____
-  \_/     )~
-   /|____/
-`,
-`  >>\_
- (o )\___
-  \_/    )~
-  //|___/
-`,
-`  >>\_
- (o )\__
-  \_/     )~
-   /|____/
-`,
-`  >>\_
- (o )\_
-  \_/     )~
-  //|____/
-`,
-`  >>\_
- (o )\___
-  \_/    )~
-   /|____/
-`,
-`  >>\_
- (o )\__
-  \_/     )~
-  //|___/
-`
-];
+let asciiFramesLibrary = {};
+let asciiRunnerFrames = [];
 let asciiRunnerIndex = 0;
+let asciiRunnerFramesOverride = [];
+let asciiCurrentAnimal = null;
+let asciiLastCorrectCharCount = 0;
+let asciiKeyCounter = 0;
+let asciiAdvanceEveryN = 1; // 키 입력 n회마다 1프레임 전환 (요청에 따라 기본 1)
+let asciiAdvanceOnlyOnCorrect = false; // 요청에 따라 키 입력 시 항상 진행
+let asciiLarge = true; // 2배 크기
 
-function updateAsciiRunner() {
+async function loadAsciiFrames() {
+    try {
+        const res = await fetch('asciiRunnerFrames.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to load asciiRunnerFrames.json');
+        const data = await res.json();
+        asciiFramesLibrary = data || {};
+        // 기본은 말 프레임
+        asciiRunnerFrames = asciiFramesLibrary.horse || [];
+        if (!Array.isArray(asciiRunnerFrames)) asciiRunnerFrames = [];
+    } catch (err) {
+        console.error('[loadAsciiFrames] ', err);
+        asciiFramesLibrary = {};
+        asciiRunnerFrames = [];
+    }
+}
+
+function setAsciiScale() {
     if (!asciiRunnerEl) return;
-    asciiRunnerEl.textContent = asciiRunnerFrames[asciiRunnerIndex % asciiRunnerFrames.length];
+    if (asciiLarge) asciiRunnerEl.classList.add('ascii-large');
+    else asciiRunnerEl.classList.remove('ascii-large');
+}
+
+function getActiveAsciiFrames() {
+    return (asciiRunnerFramesOverride && asciiRunnerFramesOverride.length > 0)
+        ? asciiRunnerFramesOverride
+        : asciiRunnerFrames;
+}
+
+function chooseAnimalForSentence(level, sentenceIndex) {
+    if (level === 1) return 'rabbit';
+    const cycle = ['horse', 'dog', 'cheetah', 'rabbit'];
+    return cycle[sentenceIndex % cycle.length];
+}
+
+function applyAsciiAnimalForCurrent() {
+    if (!asciiRunnerEl || !currentCategory) return;
+    const cat = sentenceCategories[currentCategory];
+    const level = typeof cat?.level === 'number' ? cat.level : 0;
+    const nextAnimal = chooseAnimalForSentence(level, currentSentenceIndex);
+    asciiCurrentAnimal = nextAnimal;
+    const frames = asciiFramesLibrary[nextAnimal] || [];
+    asciiRunnerFramesOverride = frames;
+    asciiRunnerIndex = 0;
+    asciiKeyCounter = 0;
+    asciiLastCorrectCharCount = 0;
+    asciiRunnerEl.textContent = frames && frames.length > 0 ? frames[0] : '';
+}
+
+function updateAsciiRunner(progressByCorrect = false) {
+    if (!asciiRunnerEl) return;
+    if (asciiAdvanceOnlyOnCorrect && !progressByCorrect) {
+        return;
+    }
+    const frames = getActiveAsciiFrames();
+    if (!frames || frames.length === 0) return;
+    asciiKeyCounter++;
+    if (asciiKeyCounter % asciiAdvanceEveryN !== 0) return;
+    asciiRunnerEl.textContent = frames[asciiRunnerIndex % frames.length];
     asciiRunnerIndex++;
+}
+
+function shakeAsciiRunner() {
+    if (!asciiRunnerEl) return;
+    asciiRunnerEl.classList.remove('shake');
+    void asciiRunnerEl.offsetWidth;
+    asciiRunnerEl.classList.add('shake');
 }
 
 function updateDisplay() {
@@ -553,11 +592,9 @@ function updateDisplay() {
         }
     }
 
-    // 카테고리 바뀔 때 러너 초기화 프레임 표시
-    if (asciiRunnerEl) {
-        asciiRunnerIndex = 0;
-        asciiRunnerEl.textContent = asciiRunnerFrames[0];
-    }
+    // 카테고리/문장 변경마다 현재 레벨 규칙에 맞는 동물 적용
+    applyAsciiAnimalForCurrent();
+    setAsciiScale();
 }
 
 function shouldAutoAdvanceInTestMode() {
@@ -712,8 +749,8 @@ typingInput.addEventListener('input', (e) => {
     const input = e.target.value;
     const target = sentenceCategories[currentCategory].sentences[currentSentenceIndex];
 
-    // 키 입력마다 프레임 업데이트
-    updateAsciiRunner();
+    // 키 입력마다 프레임 업데이트 (요청 사항)
+    updateAsciiRunner(false);
 
     if (input.length > 0) {
         const accuracy = checkAccuracy(input, target);
@@ -733,6 +770,8 @@ typingInput.addEventListener('input', (e) => {
                     sessionErrors.push(error);
                 }
             }
+            // 오타 시 흔들림
+            shakeAsciiRunner();
         }
 
         if (input === target) {
@@ -749,7 +788,7 @@ typingInput.addEventListener('input', (e) => {
             setTimeout(() => {
                 const isLastSentence = currentSentenceIndex >= sentenceCategories[currentCategory].sentences.length - 1;
                 if (!isLastSentence && !shouldAutoAdvanceInTestMode()) {
-                    nextSentence();
+                    nextSentence(); // updateDisplay() 안에서 다음 문장에 맞게 동물이 자동 재선택됨
                 } else {
                     const nextKey = getNextCategoryKey(currentCategory);
                     if (nextKey) {
@@ -766,13 +805,17 @@ typingInput.addEventListener('input', (e) => {
                         pauseTyping();
                     }
                 }
-            }, 300);
+            }, 200);
         } else if (target.startsWith(input)) {
             e.target.classList.remove('incorrect');
             e.target.classList.remove('correct');
+            // 부분 정답 진행 카운트만 업데이트
+            if (input.length > asciiLastCorrectCharCount) asciiLastCorrectCharCount = input.length;
         } else {
             e.target.classList.add('incorrect');
             e.target.classList.remove('correct');
+            // 오답 추가 입력 시도에도 흔들림만
+            shakeAsciiRunner();
         }
     } else {
         e.target.classList.remove('correct', 'incorrect');
@@ -813,6 +856,7 @@ async function loadSentences() {
 
 async function bootstrap() {
     await loadSentences();
+    await loadAsciiFrames();
     initializeCategoryMenu();
 }
 

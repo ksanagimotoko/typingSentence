@@ -552,3 +552,20 @@ main {
         color: #e6e6e6;
     }
 } 
+
+@keyframes ascii-shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+    75% { transform: translateX(-2px); }
+    100% { transform: translateX(0); }
+}
+
+.ascii-runner.shake {
+    animation: ascii-shake 160ms ease;
+}
+
+.ascii-runner.ascii-large {
+    font-size: 18px;
+    line-height: 1.0;
+} 
