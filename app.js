@@ -492,6 +492,46 @@ const accuracyIndicator = document.getElementById('accuracyIndicator');
 const remainingInfo = document.getElementById('remainingInfo');
 const levelBadge = document.getElementById('levelBadge');
 const toastEl = document.getElementById('toast');
+const asciiRunnerEl = document.getElementById('asciiRunner');
+const asciiRunnerFrames = [
+`  >>\_
+ (o )\____
+  \_/     )~
+   /|____/
+`,
+`  >>\_
+ (o )\___
+  \_/    )~
+  //|___/
+`,
+`  >>\_
+ (o )\__
+  \_/     )~
+   /|____/
+`,
+`  >>\_
+ (o )\_
+  \_/     )~
+  //|____/
+`,
+`  >>\_
+ (o )\___
+  \_/    )~
+   /|____/
+`,
+`  >>\_
+ (o )\__
+  \_/     )~
+  //|___/
+`
+];
+let asciiRunnerIndex = 0;
+
+function updateAsciiRunner() {
+    if (!asciiRunnerEl) return;
+    asciiRunnerEl.textContent = asciiRunnerFrames[asciiRunnerIndex % asciiRunnerFrames.length];
+    asciiRunnerIndex++;
+}
 
 function updateDisplay() {
     if (!currentCategory) return;
@@ -511,6 +551,12 @@ function updateDisplay() {
             remaining = currentSentences.length - (currentSentenceIndex + 1);
             remainingInfo.textContent = `다음 단계까지 남은 문장: ${remaining}`;
         }
+    }
+
+    // 카테고리 바뀔 때 러너 초기화 프레임 표시
+    if (asciiRunnerEl) {
+        asciiRunnerIndex = 0;
+        asciiRunnerEl.textContent = asciiRunnerFrames[0];
     }
 }
 
@@ -614,7 +660,7 @@ function resetTyping() {
 function nextSentence() {
     if (!currentCategory) return;
     const isLastSentence = currentSentenceIndex >= sentenceCategories[currentCategory].sentences.length - 1;
-    
+
     if (!isLastSentence) {
         currentSentenceIndex++;
         typingInput.value = '';
@@ -666,6 +712,9 @@ typingInput.addEventListener('input', (e) => {
     const input = e.target.value;
     const target = sentenceCategories[currentCategory].sentences[currentSentenceIndex];
 
+    // 키 입력마다 프레임 업데이트
+    updateAsciiRunner();
+
     if (input.length > 0) {
         const accuracy = checkAccuracy(input, target);
        // accuracyIndicator.textContent = `정확도: ${accuracy.percentage}%`;
@@ -691,12 +740,12 @@ typingInput.addEventListener('input', (e) => {
             e.target.classList.remove('incorrect');
 
             // 통계는 타이핑 세션이 시작된 상태일 때만 집계
-                        if (isTyping) {
+            if (isTyping) {
                 correctWords += target.split(/\s+/).length;
                 totalWords += target.split(/\s+/).length;
                 updateStats();
             }
-            
+
             setTimeout(() => {
                 const isLastSentence = currentSentenceIndex >= sentenceCategories[currentCategory].sentences.length - 1;
                 if (!isLastSentence && !shouldAutoAdvanceInTestMode()) {
