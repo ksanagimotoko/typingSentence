@@ -1274,7 +1274,10 @@ function getCategoryIcon(key, level) {
         topRow: '🟥',
         bottomRow: '🟩',
         leftHand: '🤚',
-        rightHand: '✋'
+        rightHand: '✋',
+        oneSyllable: getMouthSVG(1),
+        twoSyllable: getMouthSVG(2),
+        threeSyllable: getMouthSVG(3)
     };
     if (map[key]) return map[key];
     // 레벨 색상 대체 아이콘
@@ -1294,6 +1297,27 @@ function getMovieSVG() {
   <polygon points="10,13 16,16 10,19" fill="#e5e7eb"/>
 </svg>`;
 } 
+
+function getMouthSVG(count = 1) {
+    // 더 큰 입 모양을 count개 가로로 배치
+    const mouths = [];
+    const gap = 4;
+    const unit = 16; // 가로 폭 (기존 12 → 16으로 확대)
+    const midY = 12; // 중심 Y
+    const amp = 6;   // 곡선 진폭 (기존 4 → 6)
+    for (let i = 0; i < count; i++) {
+        const x = 2 + i * (unit + gap);
+        mouths.push(`<path d="M${x},${midY} Q ${x+unit/2},${midY+amp} ${x+unit},${midY}" fill="none" stroke="#ef4444" stroke-width="2.4"/>`);
+        mouths.push(`<path d="M${x},${midY} Q ${x+unit/2},${midY-amp} ${x+unit},${midY}" fill="none" stroke="#ef4444" stroke-width="2.4"/>`);
+    }
+    let width = 2 + count * unit + (count - 1) * gap + 2;
+    const svgSize = 24; // 출력 크기 고정(아이콘 영역)
+    if (width < svgSize) width = svgSize;
+    return `
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 ${width} 24" aria-hidden="true">
+  ${mouths.join('')}
+</svg>`;
+}
 
 function getBookSVG() {
     return `
