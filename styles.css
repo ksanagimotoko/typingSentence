@@ -598,3 +598,17 @@ main {
 .encourage-message.fade-in {
     animation: encourage-fade-in 220ms ease;
 } 
+
+.category-card .category-icon {
+    margin-right: 6px;
+    font-size: 1.1rem;
+}
+
+.keyboard-icon {
+    margin-top: 8px;
+}
+.keyboard-icon svg {
+    width: 140px;
+    height: auto;
+    display: block;
+} 

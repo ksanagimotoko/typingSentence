@@ -369,13 +369,17 @@ function initializeCategoryMenu() {
         const category = sentenceCategories[key];
         const card = document.createElement('div');
         card.className = 'category-card';
+        const icon = getCategoryIcon(key, category.level);
+        const hl = getHighlightForCategory(key);
+        const kb = hl === 'none' ? '' : `<div class="keyboard-icon">${getKeyboardSVG(hl)}</div>`;
         card.innerHTML = `
-            <h3>${i + 1}. ${category.name}</h3>
+            <h3><span class="category-icon">${icon}</span>${i + 1}. ${category.name}</h3>
             <p>${category.description}</p>
             <div class="category-stats">
                 <span>${category.sentences.length} 문장</span>
                 <span>레벨: ${category.level ?? '-'} / 난이도: ${getDifficulty(category.sentences)}</span>
             </div>
+            ${kb}
         `;
 
         card.addEventListener('click', () => {
@@ -1017,3 +1021,53 @@ async function bootstrap() {
 
 // 초기화
 document.addEventListener('DOMContentLoaded', () => { bootstrap().then(() => setTimeout(() => focusTypingInput(), 0)); }); 
+
+function getCategoryIcon(key, level) {
+    const map = {
+        middleRowLetters: '⌨️',
+        middleRow: '🟪',
+        topRow: '🟥',
+        bottomRow: '🟩',
+        leftHand: '🤚',
+        rightHand: '✋',
+        realEnglish: '📖'
+    };
+    if (map[key]) return map[key];
+    // 레벨 색상 대체 아이콘
+    const levelIcon = { 1:'1️⃣',2:'2️⃣',3:'3️⃣',4:'4️⃣',5:'5️⃣',6:'6️⃣',7:'7️⃣' }[level || 0];
+    return levelIcon || '⌨️';
+} 
+
+function getKeyboardSVG(highlight = 'middle') {
+    // rows: top, middle, bottom
+    const baseKey = (x, y, w, h, fill) => `<rect x="${x}" y="${y}" rx="3" ry="3" width="${w}" height="${h}" fill="${fill}" stroke="#bbb"/>`;
+    const row = (y, color) => {
+        const keys = [];
+        const w = 16, h = 12, gap = 4;
+        for (let i = 0; i < 10; i++) {
+            const x = 4 + i * (w + gap);
+            keys.push(baseKey(x, y, w, h, color));
+        }
+        return keys.join('');
+    };
+    const colNormal = '#eee';
+    const colHL = '#cde4ff';
+    const colTop = highlight === 'top' ? colHL : colNormal;
+    const colMid = highlight === 'middle' ? colHL : colNormal;
+    const colBot = highlight === 'bottom' ? colHL : colNormal;
+    return `
+<svg viewBox="0 0 190 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <rect x="1" y="1" width="188" height="58" rx="6" ry="6" fill="#f7f7f7" stroke="#ddd"/>
+  ${row(10, colTop)}
+  ${row(26, colMid)}
+  ${row(42, colBot)}
+</svg>`;
+}
+
+function getHighlightForCategory(key) {
+    if (key === 'topRow') return 'top';
+    if (key === 'middleRow' || key === 'middleRowLetters') return 'middle';
+    if (key === 'bottomRow') return 'bottom';
+    // 손 연습은 중간행 기준, 실전은 하이라이트 없음
+    return 'none';
+} 
