@@ -576,3 +576,25 @@ main {
     font-size: 18px;
     line-height: 1.0;
 } 
+
+.encourage-message {
+    margin: 4px 0 12px;
+    text-align: center;
+    font-weight: 700;
+    color: #4a5568;
+}
+
+@media (prefers-color-scheme: dark) {
+    .encourage-message {
+        color: #e2e8f0;
+    }
+}
+
+@keyframes encourage-fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.encourage-message.fade-in {
+    animation: encourage-fade-in 220ms ease;
+} 

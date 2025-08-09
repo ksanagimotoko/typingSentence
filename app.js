@@ -350,6 +350,8 @@ function goToCategory(newKey, keepSession = true) {
     updateDisplay();
     updateLevelBadge();
     applyCategoryTheme();
+    // 입력 칸 즉시 포커스 (지연 재시도)
+    setTimeout(() => focusTypingInput(), 0);
     if (keepSession && isTyping && !timer) {
         startTimer();
     }
@@ -384,7 +386,12 @@ function initializeCategoryMenu() {
             typingArea.classList.add('active');
             updateDisplay();
             updateLevelBadge();
+            // 입력 칸 포커스 보장
+            setTimeout(() => focusTypingInput(), 0);
         });
+
+        // 카테고리 선택 시 입력 칸에 즉시 포커스 (지연 재시도)
+        setTimeout(() => focusTypingInput(), 0);
 
         categoryMenu.appendChild(card);
     }
@@ -526,6 +533,26 @@ function setAsciiScale() {
     else asciiRunnerEl.classList.remove('ascii-large');
 }
 
+function focusTypingInput(retries = 6, delayMs = 80) {
+    if (!typingInput) return;
+    const tryFocus = () => {
+        // 보이는 상태인지 확인
+        const isHidden = typingInput.offsetParent === null;
+        if (!isHidden) {
+            typingInput.focus({ preventScroll: false });
+            try {
+                // 커서를 항상 끝으로 이동
+                const len = typingInput.value.length;
+                typingInput.setSelectionRange(len, len);
+            } catch (_) {}
+            return true;
+        }
+        return false;
+    };
+    if (tryFocus()) return;
+    if (retries > 0) setTimeout(() => focusTypingInput(retries - 1, delayMs), delayMs);
+}
+
 function getActiveAsciiFrames() {
     return (asciiRunnerFramesOverride && asciiRunnerFramesOverride.length > 0)
         ? asciiRunnerFramesOverride
@@ -572,6 +599,64 @@ function shakeAsciiRunner() {
     asciiRunnerEl.classList.add('shake');
 }
 
+const encourageEl = document.getElementById('encourageMessage');
+const encourageMessages = [
+    '지금처럼만! 끝까지 가보자!',
+    '좋아! 리듬 탔다!',
+    '집중! 너라면 할 수 있어!',
+    '손가락이 춤춘다! 계속 고!',
+    '오타는 잠깐, 실력은 영원!',
+    '한 글자씩, 확실하게!',
+    '속도보다 중요한 건 정확도!',
+    '좋은 흐름이야! 유지하자!',
+    '아주 좋아! 바로 그거야!',
+    '딱 한 문장 더!',
+    '페이스 좋아! 그대로!',
+    '정확! 멋져!',
+    '꾸준함이 실력을 만든다!',
+    '집중 유지! 충분히 가능해!',
+    '키보드가 익숙해지는 중!',
+    '호흡 좋아! 매끄럽다!',
+    '한 글자 한 글자 확실하게!',
+    '오타? 괜찮아, 바로 회복!',
+    '나이스! 속도 올라간다!',
+    '좋아! 견고해지고 있어!'
+];
+const encourageByLevel = {
+    1: [ '기본기 탄탄! 아주 좋아!', '정확도가 곧 속도다!', '중요한 건 손가락 기억!' ],
+    2: [ '홈포지션 유지!', '리듬을 가져가자!', '손가락이 따뜻해졌어!' ],
+    3: [ '상단 행 정복 중!', '시선은 화면, 손은 자연스럽게!', '키 간격에 익숙해지고 있어!' ],
+    4: [ '하단 행 흔들림 없다!', '부드럽게, 천천히, 정확히!', '꾸준함이 이긴다!' ],
+    5: [ '실전 감각 올라온다!', '문장 호흡 잡혔다!', '멋진 페이스야!' ]
+};
+
+function pickFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function pickEncourage(kind = 'general') {
+    const cat = currentCategory ? sentenceCategories[currentCategory] : null;
+    const level = typeof cat?.level === 'number' ? cat.level : 0;
+    const levelArr = encourageByLevel[level] || [];
+    if (kind === 'error') {
+        return pickFrom([ '괜찮아! 다시 한 번!', '천천히, 정확히!', '오타는 잠깐, 다시 고!' ]);
+    }
+    if (kind === 'partial') {
+        return pickFrom([ '좋아! 한 글자 더!', '리듬 좋다! 계속!', '아주 좋아, 유지!' ]);
+    }
+    if (kind === 'success') {
+        return pickFrom([ '완벽! 멋지다!', '깔끔했다!', '좋았어! 다음으로!' ]);
+    }
+    // general
+    if (levelArr.length && Math.random() < 0.6) return pickFrom(levelArr);
+    return pickFrom(encourageMessages);
+}
+function showEncourage(kind = 'general') {
+    if (!encourageEl) return;
+    encourageEl.classList.remove('fade-in');
+    encourageEl.textContent = pickEncourage(kind);
+    // reflow to restart animation
+    void encourageEl.offsetWidth;
+    encourageEl.classList.add('fade-in');
+}
+
 function updateDisplay() {
     if (!currentCategory) return;
     const currentSentences = sentenceCategories[currentCategory].sentences;
@@ -592,9 +677,10 @@ function updateDisplay() {
         }
     }
 
-    // 카테고리/문장 변경마다 현재 레벨 규칙에 맞는 동물 적용
+    // 카테고리/문장 변경마다 현재 레벨 규칙에 맞는 동물 적용 및 응원 문구 표시
     applyAsciiAnimalForCurrent();
     setAsciiScale();
+    showEncourage('general');
 }
 
 function shouldAutoAdvanceInTestMode() {
@@ -659,7 +745,7 @@ function checkAccuracy(input, target) {
 function startTyping() {
     isTyping = true;
     startTimer();
-    typingInput.focus();
+    if (typingInput) typingInput.focus();
     startBtn.textContent = '일시정지';
     startBtn.classList.remove('btn-primary');
     startBtn.classList.add('btn-secondary');
@@ -830,6 +916,7 @@ typingInput.addEventListener('input', (e) => {
             // 오타 시 흔들림 + 경고음
             shakeAsciiRunner();
             playErrorBeep();
+            showEncourage('error');
         }
 
         if (input === target) {
@@ -845,6 +932,7 @@ typingInput.addEventListener('input', (e) => {
 
             // 문장 완성 성공음
             playSuccessTone();
+            showEncourage('success');
 
             setTimeout(() => {
                 const isLastSentence = currentSentenceIndex >= sentenceCategories[currentCategory].sentences.length - 1;
@@ -875,12 +963,14 @@ typingInput.addEventListener('input', (e) => {
                 asciiLastCorrectCharCount = input.length;
                 // 올바르게 한 글자 진행될 때 부드러운 성공음
                 playSuccessTone();
+                showEncourage('partial');
             }
         } else {
             e.target.classList.add('incorrect');
             e.target.classList.remove('correct');
             // 오답 추가 입력 시도에도 흔들림만
             shakeAsciiRunner();
+            showEncourage('error');
         }
     } else {
         e.target.classList.remove('correct', 'incorrect');
@@ -926,4 +1016,4 @@ async function bootstrap() {
 }
 
 // 초기화
-document.addEventListener('DOMContentLoaded', bootstrap); 
+document.addEventListener('DOMContentLoaded', () => { bootstrap().then(() => setTimeout(() => focusTypingInput(), 0)); }); 
