@@ -336,6 +336,15 @@ let defaultBodyBackground = '';
 let isTestMode = false; // 필요 시 URL 파라미터나 로컬스토리지로 제어 가능
 const TEST_MODE_THRESHOLD_RATIO = 0.1;
 
+// Alpha Sprint (100 letters in 60s) state
+let alphaSprintTarget = '';
+const ALPHA_SPRINT_TOTAL = 100;
+const ALPHA_SPRINT_DURATION = 60; // seconds
+let alphaSprintTimer = null;
+let alphaSprintRemaining = ALPHA_SPRINT_DURATION;
+let alphaSprintActive = false;
+let alphaSprintPrevLen = 0;
+
 function goToCategory(newKey, keepSession = true) {
     if (!sentenceCategories[newKey]) return;
     currentCategory = newKey;
@@ -347,12 +356,21 @@ function goToCategory(newKey, keepSession = true) {
     if (typeof accuracyIndicator !== 'undefined') {
         accuracyIndicator.textContent = '';
     }
+
+    // Alpha Sprint 진입 시 기존 일반 타이머 정지 및 초기화
+    if (currentCategory === 'alphaSprint') {
+        stopTimer();
+        if (alphaSprintTimer) { clearInterval(alphaSprintTimer); alphaSprintTimer = null; }
+        alphaSprintActive = false; // updateDisplay에서 시작
+        timerDisplay.textContent = '01:00';
+    }
+
     updateDisplay();
     updateLevelBadge();
     applyCategoryTheme();
     // 입력 칸 즉시 포커스 (지연 재시도)
     setTimeout(() => focusTypingInput(), 0);
-    if (keepSession && isTyping && !timer) {
+    if (keepSession && isTyping && !timer && currentCategory !== 'alphaSprint') {
         startTimer();
     }
 }
@@ -724,6 +742,23 @@ function revealMovieTitleAtIndex(index) {
 
 function updateDisplay() {
     if (!currentCategory) return;
+
+    // Alpha Sprint 모드 특수 처리
+    if (currentCategory === 'alphaSprint') {
+        if (!alphaSprintActive) startAlphaSprint();
+        renderSentenceHighlight(alphaSprintTarget, typingInput ? typingInput.value : '');
+        setContainerWidthForSentence(alphaSprintTarget);
+        progressBar.style.width = `0%`;
+        if (remainingInfo) {
+            const remaining = Math.max(0, ALPHA_SPRINT_TOTAL - (typingInput?.value?.length || 0));
+            remainingInfo.textContent = `남은 글자: ${remaining} / 제한시간: ${alphaSprintRemaining}s`;
+        }
+        applyAsciiAnimalForCurrent();
+        setAsciiScale();
+        showEncourage('general');
+        return;
+    }
+
     const currentSentences = sentenceCategories[currentCategory].sentences;
     const targetText = currentSentences[currentSentenceIndex];
     renderSentenceHighlight(targetText, typingInput ? typingInput.value : '');
@@ -1140,6 +1175,35 @@ window.addEventListener('keydown', onMovieNumberKey);
 typingInput.addEventListener('input', (e) => {
     if (!currentCategory) return;
 
+    // Alpha Sprint 처리
+    if (currentCategory === 'alphaSprint') {
+        const raw = e.target.value;
+        const input = raw.replace(/[^a-z]/g, '').slice(0, ALPHA_SPRINT_TOTAL);
+        if (input !== raw) {
+            e.target.value = input; // 비영문 제거/길이 제한
+        }
+        // 사운드 판정: 새로 입력된 1글자만 비교(백스페이스는 무음)
+        if (input.length > alphaSprintPrevLen) {
+            const idx = input.length - 1;
+            const typedChar = input[idx];
+            const targetChar = alphaSprintTarget[idx];
+            if (typedChar === targetChar) {
+                playSuccessTone();
+            } else {
+                playErrorBeep();
+                shakeAsciiRunner();
+            }
+        }
+        alphaSprintPrevLen = input.length;
+
+        renderSentenceHighlight(alphaSprintTarget, input);
+        updateAsciiRunner(false);
+        if (input.length >= ALPHA_SPRINT_TOTAL) {
+            finishAlphaSprint();
+        }
+        return;
+    }
+
     const input = e.target.value;
     const target = sentenceCategories[currentCategory].sentences[currentSentenceIndex];
 
@@ -1277,7 +1341,8 @@ function getCategoryIcon(key, level) {
         rightHand: '✋',
         oneSyllable: getMouthSVG(1),
         twoSyllable: getMouthSVG(2),
-        threeSyllable: getMouthSVG(3)
+        threeSyllable: getMouthSVG(3),
+        alphaSprint: '⏱️'
     };
     if (map[key]) return map[key];
     // 레벨 색상 대체 아이콘
@@ -1427,3 +1492,56 @@ window.addEventListener('resize', () => {
     const t = getCurrentTargetText();
     if (t) setContainerWidthForSentence(t);
 }); 
+
+function getRandomLetters(count) {
+    const letters = 'abcdefghijklmnopqrstuvwxyz';
+    let out = '';
+    for (let i = 0; i < count; i++) {
+        out += letters[Math.floor(Math.random() * letters.length)];
+    }
+    return out;
+}
+
+function startAlphaSprint() {
+    alphaSprintTarget = getRandomLetters(ALPHA_SPRINT_TOTAL);
+    alphaSprintRemaining = ALPHA_SPRINT_DURATION;
+    alphaSprintActive = true;
+    alphaSprintPrevLen = 0;
+    typingInput.value = '';
+    renderSentenceHighlight(alphaSprintTarget, '');
+    setContainerWidthForSentence(alphaSprintTarget);
+    // 카운트다운 타이머
+    if (alphaSprintTimer) clearInterval(alphaSprintTimer);
+    alphaSprintTimer = setInterval(() => {
+        alphaSprintRemaining -= 1;
+        const minutes = Math.floor(alphaSprintRemaining / 60);
+        const seconds = alphaSprintRemaining % 60;
+        timerDisplay.textContent = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+        if (alphaSprintRemaining <= 0) {
+            finishAlphaSprint();
+        }
+    }, 1000);
+}
+
+function finishAlphaSprint() {
+    if (alphaSprintTimer) {
+        clearInterval(alphaSprintTimer);
+        alphaSprintTimer = null;
+    }
+    alphaSprintActive = false;
+    // 결과 집계: 맞춘 글자 수
+    const typed = typingInput.value || '';
+    let correct = 0;
+    for (let i = 0; i < Math.min(typed.length, alphaSprintTarget.length); i++) {
+        if (typed[i] === alphaSprintTarget[i]) correct++;
+    }
+    playSuccessTone();
+    showToast(`Alpha Sprint 종료: ${correct}/${ALPHA_SPRINT_TOTAL} 글자 정확히 입력`);
+    // 다음 카테고리로 자동 진행
+    const nextKey = getNextCategoryKey('alphaSprint');
+    if (nextKey) {
+        goToCategory(nextKey);
+    } else {
+        backToMenu();
+    }
+} 
