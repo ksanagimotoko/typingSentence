@@ -968,20 +968,69 @@ function showMovieChoicesAtIndex(index) {
     });
     sentenceDisplay.appendChild(wrap);
     movieChoicesActive = true;
+    // 보기 표시 시 입력 포커스 유지
+    focusTypingInput();
 }
 function verifyMovieAnswer(index, selectedIdx) {
     const cat = sentenceCategories[currentCategory];
     const correctIdx = Array.isArray(cat.answers) ? cat.answers[index] : -1;
     const isCorrect = selectedIdx === correctIdx;
-    showToast(isCorrect ? '정답!' : '오답!');
+
+    const wrap = document.getElementById('movieChoices');
+    if (wrap) {
+        const btns = wrap.querySelectorAll('button');
+        btns.forEach((b, i) => {
+            b.disabled = true;
+            b.style.cursor = 'default';
+            if (i === correctIdx) {
+                b.style.background = '#e6ffed';
+                b.style.borderColor = '#34d399';
+            }
+            if (i === selectedIdx && !isCorrect) {
+                b.style.background = '#ffe6e6';
+                b.style.borderColor = '#f87171';
+            }
+        });
+    }
+
+    // 정답/오답 텍스트 표시
+    clearMovieTitleReveal();
+    const feed = document.createElement('div');
+    feed.id = 'movieTitleReveal';
+    const correctTitle = (cat.titles && cat.titles[index]) ? cat.titles[index] : '';
+    feed.textContent = isCorrect ? `정답입니다! → "${correctTitle}"` : `오답입니다! 정답은 "${correctTitle}"`;
+    feed.style.marginTop = '8px';
+    feed.style.fontWeight = '700';
+    feed.style.color = isCorrect ? '#065f46' : '#991b1b';
+    feed.style.fontSize = '0.95rem';
+    feed.style.opacity = '0';
+    feed.style.transition = 'opacity 200ms ease';
+    const anchor = document.getElementById('encourageMessage');
+    if (anchor) {
+        anchor.insertAdjacentElement('afterend', feed);
+    } else {
+        sentenceDisplay.appendChild(feed);
+    }
+    requestAnimationFrame(() => { feed.style.opacity = '1'; });
+
+    // 다음 진행 안내
+    const hint = document.createElement('div');
+    hint.style.marginTop = '4px';
+    hint.style.fontSize = '0.85rem';
+    hint.style.color = '#475569';
+    hint.textContent = '계속할지 종료할지 아래 버튼을 선택하세요.';
+    sentenceDisplay.appendChild(hint);
+
     setTimeout(() => {
         askContinueOrExit();
-    }, 500);
+    }, 400);
 }
 function onMovieNumberKey(e) {
     if (!movieChoicesActive) return;
     const key = e.key;
     if (!/^[1-9]$/.test(key)) return;
+    e.preventDefault();
+    e.stopPropagation();
     const wrap = document.getElementById('movieChoices');
     if (!wrap) return;
     const idx = parseInt(key, 10) - 1;
@@ -991,18 +1040,58 @@ function onMovieNumberKey(e) {
     }
 }
 function askContinueOrExit() {
-    const cont = confirm('계속하시겠습니까? 취소를 누르면 메뉴로 돌아갑니다.');
-    if (cont) {
+    // 기존 confirm 대신 버튼 UI 표시
+    // 이전 이어서/종료 UI 제거
+    const old = document.getElementById('movieContinueExit');
+    if (old) old.remove();
+
+    const wrap = document.createElement('div');
+    wrap.id = 'movieContinueExit';
+    wrap.style.marginTop = '8px';
+    wrap.style.display = 'flex';
+    wrap.style.gap = '8px';
+
+    const continueBtn = document.createElement('button');
+    continueBtn.textContent = '계속하기';
+    continueBtn.style.padding = '6px 10px';
+    continueBtn.style.border = '1px solid #cbd5e1';
+    continueBtn.style.borderRadius = '8px';
+    continueBtn.style.background = '#10b981';
+    continueBtn.style.color = '#fff';
+    continueBtn.style.cursor = 'pointer';
+
+    const exitBtn = document.createElement('button');
+    exitBtn.textContent = '메뉴로 돌아가기';
+    exitBtn.style.padding = '6px 10px';
+    exitBtn.style.border = '1px solid #cbd5e1';
+    exitBtn.style.borderRadius = '8px';
+    exitBtn.style.background = '#64748b';
+    exitBtn.style.color = '#fff';
+    exitBtn.style.cursor = 'pointer';
+
+    continueBtn.addEventListener('click', () => {
         clearMovieTitleReveal();
         clearMovieChoices();
+        wrap.remove();
         nextSentence();
         focusTypingInput();
-    } else {
-        // 메뉴로 복귀
+    });
+
+    exitBtn.addEventListener('click', () => {
         clearMovieTitleReveal();
         clearMovieChoices();
+        wrap.remove();
         backToMenu();
         focusTypingInput();
+    });
+
+    wrap.appendChild(continueBtn);
+    wrap.appendChild(exitBtn);
+    const anchorForBtns = document.getElementById('encourageMessage');
+    if (anchorForBtns) {
+        anchorForBtns.insertAdjacentElement('afterend', wrap);
+    } else {
+        sentenceDisplay.appendChild(wrap);
     }
 }
 // 번호키로 보기 선택 핸들러 등록
