@@ -89,11 +89,11 @@ let sentenceCategories = window.sentenceCategories || {
             "Ruth will read gala news.",
             "Julie had quick tea break.",
             "Fred read tall tales aloud.",
-            "Peter kept Sally’s tea hot.",
+            "Peter kept Sally's tea hot.",
             "Kate asked Paul for help.",
             "Tim read all about the play.",
             "Julie will type fast for work.",
-            "Paul kept Ruth’s seat safe.",
+            "Paul kept Ruth's seat safe.",
             "Ruth had tea and salad.",
             "Jerry read all the gala notes.",
             "Peter will ask for quick help.",
@@ -115,7 +115,7 @@ let sentenceCategories = window.sentenceCategories || {
             "Peter kept all lists safe.",
             "Fred typed a gala report.",
             "Julie read the tea menu.",
-            "Paul kept Ruth’s seat safe.",
+            "Paul kept Ruth's seat safe.",
             "Jerry had soup and salad.",
             "Tim read the gala notes.",
             "Kate kept all the maps safe.",
@@ -344,6 +344,17 @@ let alphaSprintTimer = null;
 let alphaSprintRemaining = ALPHA_SPRINT_DURATION;
 let alphaSprintActive = false;
 let alphaSprintPrevLen = 0;
+let alphaSprintStage = 1; // 1: a-z, 2: a-zA-Z, 3: a-zA-Z0-9
+
+function getSprintCharset(stage) {
+    if (stage === 1) return 'abcdefghijklmnopqrstuvwxyz';
+    if (stage === 2) return 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    return 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+}
+
+function getSprintTotal() {
+    return isTestMode ? 10 : ALPHA_SPRINT_TOTAL;
+}
 
 function goToCategory(newKey, keepSession = true) {
     if (!sentenceCategories[newKey]) return;
@@ -750,7 +761,7 @@ function updateDisplay() {
         setContainerWidthForSentence(alphaSprintTarget);
         progressBar.style.width = `0%`;
         if (remainingInfo) {
-            const remaining = Math.max(0, ALPHA_SPRINT_TOTAL - (typingInput?.value?.length || 0));
+            const remaining = Math.max(0, getSprintTotal() - (typingInput?.value?.length || 0));
             remainingInfo.textContent = `남은 글자: ${remaining} / 제한시간: ${alphaSprintRemaining}s`;
         }
         applyAsciiAnimalForCurrent();
@@ -1178,9 +1189,11 @@ typingInput.addEventListener('input', (e) => {
     // Alpha Sprint 처리
     if (currentCategory === 'alphaSprint') {
         const raw = e.target.value;
-        const input = raw.replace(/[^a-z]/g, '').slice(0, ALPHA_SPRINT_TOTAL);
+        let allowed = getSprintCharset(alphaSprintStage);
+        const pattern = new RegExp(`[^${allowed.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}]`, 'g');
+        const input = raw.replace(pattern, '').slice(0, getSprintTotal());
         if (input !== raw) {
-            e.target.value = input; // 비영문 제거/길이 제한
+            e.target.value = input; // 비허용 문자 제거/길이 제한
         }
         // 사운드 판정: 새로 입력된 1글자만 비교(백스페이스는 무음)
         if (input.length > alphaSprintPrevLen) {
@@ -1198,8 +1211,8 @@ typingInput.addEventListener('input', (e) => {
 
         renderSentenceHighlight(alphaSprintTarget, input);
         updateAsciiRunner(false);
-        if (input.length >= ALPHA_SPRINT_TOTAL) {
-            finishAlphaSprint();
+        if (input.length >= getSprintTotal()) {
+            finishAlphaSprint(true);
         }
         return;
     }
@@ -1494,7 +1507,7 @@ window.addEventListener('resize', () => {
 }); 
 
 function getRandomLetters(count) {
-    const letters = 'abcdefghijklmnopqrstuvwxyz';
+    const letters = getSprintCharset(alphaSprintStage);
     let out = '';
     for (let i = 0; i < count; i++) {
         out += letters[Math.floor(Math.random() * letters.length)];
@@ -1503,7 +1516,7 @@ function getRandomLetters(count) {
 }
 
 function startAlphaSprint() {
-    alphaSprintTarget = getRandomLetters(ALPHA_SPRINT_TOTAL);
+    alphaSprintTarget = getRandomLetters(getSprintTotal());
     alphaSprintRemaining = ALPHA_SPRINT_DURATION;
     alphaSprintActive = true;
     alphaSprintPrevLen = 0;
@@ -1518,12 +1531,13 @@ function startAlphaSprint() {
         const seconds = alphaSprintRemaining % 60;
         timerDisplay.textContent = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
         if (alphaSprintRemaining <= 0) {
-            finishAlphaSprint();
+            const success = (typingInput.value || '').length >= getSprintTotal();
+            finishAlphaSprint(success);
         }
     }, 1000);
 }
 
-function finishAlphaSprint() {
+function finishAlphaSprint(success = false) {
     if (alphaSprintTimer) {
         clearInterval(alphaSprintTimer);
         alphaSprintTimer = null;
@@ -1535,13 +1549,140 @@ function finishAlphaSprint() {
     for (let i = 0; i < Math.min(typed.length, alphaSprintTarget.length); i++) {
         if (typed[i] === alphaSprintTarget[i]) correct++;
     }
-    playSuccessTone();
-    showToast(`Alpha Sprint 종료: ${correct}/${ALPHA_SPRINT_TOTAL} 글자 정확히 입력`);
-    // 다음 카테고리로 자동 진행
-    const nextKey = getNextCategoryKey('alphaSprint');
-    if (nextKey) {
-        goToCategory(nextKey);
+
+    if (success) {
+        playSuccessTone();
+        showToast(`Alpha Sprint ${alphaSprintStage}단계 완료: ${correct}/${getSprintTotal()}`);
+        if (alphaSprintStage < 3) {
+            // 다음 단계로 상승
+            alphaSprintStage += 1;
+            setTimeout(() => {
+                startAlphaSprint();
+                focusTypingInput();
+            }, 400);
+            return;
+        } else {
+            // 3단계 모두 통과 → 인증
+            setTimeout(() => {
+                const name = prompt('축하합니다! 3단계를 모두 통과했습니다. 인증서에 표기할 이름을 입력하세요:', '');
+                if (name && name.trim()) {
+                    showCertification(name.trim());
+                }
+                // 다음 카테고리로 자동 진행
+                const nextKey = getNextCategoryKey('alphaSprint');
+                if (nextKey) {
+                    goToCategory(nextKey);
+                } else {
+                    backToMenu();
+                }
+            }, 200);
+            return;
+        }
     } else {
-        backToMenu();
+        // 실패 처리: 다시하기 / 메뉴 버튼 제공
+        showToast(`Alpha Sprint 실패: ${correct}/${getSprintTotal()}`);
+        showSprintRetryUI();
     }
+}
+
+function showSprintRetryUI() {
+    const panel = ensureQuizPanel();
+    // 초기화
+    const old = document.getElementById('sprintRetry');
+    if (old) old.remove();
+    const wrap = document.createElement('div');
+    wrap.id = 'sprintRetry';
+    wrap.style.marginTop = '8px';
+    wrap.style.display = 'flex';
+    wrap.style.gap = '8px';
+    const retryBtn = document.createElement('button');
+    retryBtn.textContent = '다시하기';
+    retryBtn.className = 'btn btn-primary';
+    const exitBtn = document.createElement('button');
+    exitBtn.textContent = '메뉴로';
+    exitBtn.className = 'btn btn-secondary';
+
+    retryBtn.addEventListener('click', () => {
+        wrap.remove();
+        alphaSprintStage = 1;
+        startAlphaSprint();
+        focusTypingInput();
+    });
+    exitBtn.addEventListener('click', () => {
+        wrap.remove();
+        backToMenu();
+    });
+    wrap.appendChild(retryBtn);
+    wrap.appendChild(exitBtn);
+    panel.appendChild(wrap);
+}
+
+function showCertification(name) {
+    // 간단 인증서 오버레이
+    const overlayId = 'tbCertification';
+    const old = document.getElementById(overlayId);
+    if (old) old.remove();
+    const ov = document.createElement('div');
+    ov.id = overlayId;
+    ov.style.position = 'fixed';
+    ov.style.inset = '0';
+    ov.style.background = 'rgba(0,0,0,0.6)';
+    ov.style.display = 'flex';
+    ov.style.alignItems = 'center';
+    ov.style.justifyContent = 'center';
+    ov.style.zIndex = '9999';
+
+    const card = document.createElement('div');
+    card.style.background = 'white';
+    card.style.borderRadius = '16px';
+    card.style.padding = '24px 28px';
+    card.style.boxShadow = '0 12px 30px rgba(0,0,0,0.25)';
+    card.style.textAlign = 'center';
+    card.style.minWidth = '320px';
+
+    const badge = document.createElement('div');
+    badge.innerHTML = getCertificationBadgeSVG();
+    badge.style.marginBottom = '10px';
+
+    const title = document.createElement('div');
+    title.textContent = 'TypingBook Certification';
+    title.style.fontSize = '1.25rem';
+    title.style.fontWeight = '700';
+    title.style.marginBottom = '8px';
+
+    const body = document.createElement('div');
+    body.textContent = `${name}님, Alpha Sprint 3단계를 통과하였습니다.`;
+    body.style.marginBottom = '12px';
+
+    const close = document.createElement('button');
+    close.textContent = '닫기';
+    close.className = 'btn btn-primary';
+    close.addEventListener('click', () => ov.remove());
+
+    card.appendChild(badge);
+    card.appendChild(title);
+    card.appendChild(body);
+    card.appendChild(close);
+
+    ov.appendChild(card);
+    document.body.appendChild(ov);
+}
+
+function getCertificationBadgeSVG() {
+    return `
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 64 64" aria-hidden="true">
+  <defs>
+    <filter id="badgeShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.25)"/>
+    </filter>
+  </defs>
+  <!-- Ribbon tails -->
+  <polygon points="24,56 28,44 32,52 36,44 40,56 32,60" fill="#ef4444"/>
+  <!-- Outer medal -->
+  <circle cx="32" cy="28" r="22" fill="#f59e0b" stroke="#b45309" stroke-width="2" filter="url(#badgeShadow)"/>
+  <!-- Inner ring -->
+  <circle cx="32" cy="28" r="16" fill="#fde68a" stroke="#fbbf24" stroke-width="2"/>
+  <!-- Check mark -->
+  <path d="M24 28 l6 6 14-14" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+</svg>`;
 } 
