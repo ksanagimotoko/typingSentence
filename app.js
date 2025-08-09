@@ -938,6 +938,7 @@ function playSuccessTone() {
 }
 
 let movieChoicesActive = false;
+let movieShuffledCorrectIndex = {};
 function clearMovieChoices() {
     const el = document.getElementById('movieChoices');
     if (el) el.remove();
@@ -946,18 +947,38 @@ function clearMovieChoices() {
 function showMovieChoicesAtIndex(index) {
     if (currentCategory !== 'movieQuiz') return;
     const cat = sentenceCategories[currentCategory];
-    const choices = Array.isArray(cat.choices) ? cat.choices[index] : null;
-    if (!choices || choices.length === 0) return;
+    const originalChoices = Array.isArray(cat.choices) ? cat.choices[index] : null;
+    if (!originalChoices || originalChoices.length === 0) return;
+
+    // 정답 인덱스(원본에서의 위치). 없으면 0으로 가정
+    const originalCorrect = Array.isArray(cat.answers) ? cat.answers[index] : 0;
+
+    // 섞기: [텍스트, 원래 인덱스] 쌍으로 셔플
+    const entries = originalChoices.map((text, i) => ({ text, originalIndex: i }));
+    for (let i = entries.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = entries[i];
+        entries[i] = entries[j];
+        entries[j] = tmp;
+    }
+
+    // 섞인 배열에서 정답의 새 위치를 기록
+    const shuffledCorrectIdx = entries.findIndex(e => e.originalIndex === originalCorrect);
+    movieShuffledCorrectIndex[index] = shuffledCorrectIdx;
+
     clearMovieChoices();
     const wrap = document.createElement('div');
     wrap.id = 'movieChoices';
+    wrap.dataset.questionIndex = String(index);
+    wrap.dataset.correctIndex = String(shuffledCorrectIdx);
     wrap.style.marginTop = '6px';
     wrap.style.display = 'grid';
     wrap.style.gridTemplateColumns = '1fr 1fr';
     wrap.style.gap = '6px';
-    choices.forEach((c, i) => {
+
+    entries.forEach((entry, i) => {
         const btn = document.createElement('button');
-        btn.textContent = `${i + 1}. ${c}`;
+        btn.textContent = `${i + 1}. ${entry.text}`;
         btn.style.padding = '6px 8px';
         btn.style.border = '1px solid #cbd5e1';
         btn.style.borderRadius = '8px';
@@ -966,17 +987,24 @@ function showMovieChoicesAtIndex(index) {
         btn.addEventListener('click', () => verifyMovieAnswer(index, i));
         wrap.appendChild(btn);
     });
+
     sentenceDisplay.appendChild(wrap);
     movieChoicesActive = true;
-    // 보기 표시 시 입력 포커스 유지
     focusTypingInput();
 }
 function verifyMovieAnswer(index, selectedIdx) {
     const cat = sentenceCategories[currentCategory];
-    const correctIdx = Array.isArray(cat.answers) ? cat.answers[index] : -1;
+    const wrap = document.getElementById('movieChoices');
+    // 데이터셋 우선 (셔플 이후 정확)
+    let correctIdx = -1;
+    if (wrap && typeof wrap.dataset.correctIndex === 'string') {
+        correctIdx = parseInt(wrap.dataset.correctIndex, 10);
+    } else {
+        const correctIdxOriginal = Array.isArray(cat.answers) ? cat.answers[index] : -1;
+        correctIdx = (typeof movieShuffledCorrectIndex[index] === 'number') ? movieShuffledCorrectIndex[index] : correctIdxOriginal;
+    }
     const isCorrect = selectedIdx === correctIdx;
 
-    const wrap = document.getElementById('movieChoices');
     if (wrap) {
         const btns = wrap.querySelectorAll('button');
         btns.forEach((b, i) => {
