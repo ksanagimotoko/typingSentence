@@ -1262,19 +1262,52 @@ async function bootstrap() {
 document.addEventListener('DOMContentLoaded', () => { bootstrap().then(() => setTimeout(() => focusTypingInput(), 0)); }); 
 
 function getCategoryIcon(key, level) {
+    if (key === 'realEnglish') {
+        return getBookSVG();
+    }
+    if (key === 'movieQuiz') {
+        return getMovieSVG();
+    }
     const map = {
         middleRowLetters: '⌨️',
         middleRow: '🟪',
         topRow: '🟥',
         bottomRow: '🟩',
         leftHand: '🤚',
-        rightHand: '✋',
-        realEnglish: '📖'
+        rightHand: '✋'
     };
     if (map[key]) return map[key];
     // 레벨 색상 대체 아이콘
-    const levelIcon = { 1:'1️⃣',2:'2️⃣',3:'3️⃣',4:'4️⃣',5:'5️⃣',6:'6️⃣',7:'7️⃣' }[level || 0];
+    const levelIcon = { 1:'1️⃣',2:'2️⃣',3:'3️⃣',4:'4️⃣',5:'5️⃣',6:'6️⃣',7:'7️⃣',8:'8️⃣',9:'9️⃣' }[level || 0];
     return levelIcon || '⌨️';
+} 
+
+function getMovieSVG() {
+    // 클랩보드(영화 슬레이트) 스타일
+    return `
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+  <rect x="3" y="7" width="18" height="12" rx="2" fill="#0f172a" stroke="#94a3b8"/>
+  <path d="M3 7h18l-2-4H5l-2 4z" fill="#1f2937" stroke="#94a3b8"/>
+  <rect x="6" y="4" width="3" height="3" transform="rotate(-15 7.5 5.5)" fill="#e5e7eb"/>
+  <rect x="11" y="4" width="3" height="3" transform="rotate(-15 12.5 5.5)" fill="#e5e7eb"/>
+  <rect x="16" y="4" width="3" height="3" transform="rotate(-15 17.5 5.5)" fill="#e5e7eb"/>
+  <polygon points="10,13 16,16 10,19" fill="#e5e7eb"/>
+</svg>`;
+} 
+
+function getBookSVG() {
+    return `
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+  <rect x="2" y="4" width="9" height="14" rx="2" fill="#eef2ff" stroke="#667eea"/>
+  <rect x="13" y="4" width="9" height="14" rx="2" fill="#eef2ff" stroke="#667eea"/>
+  <rect x="12" y="4" width="1" height="14" fill="#667eea"/>
+  <line x1="4" y1="8" x2="10" y2="8" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="4" y1="11" x2="10" y2="11" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="4" y1="14" x2="10" y2="14" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="14" y1="8" x2="20" y2="8" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="14" y1="11" x2="20" y2="11" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="14" y1="14" x2="20" y2="14" stroke="#94a3b8" stroke-width="1"/>
+</svg>`;
 } 
 
 function getKeyboardSVG(highlight = 'middle') {

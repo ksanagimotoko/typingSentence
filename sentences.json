@@ -347,7 +347,7 @@
   },
   "movieQuiz": {
     "level": 9,
-    "name": "영화 줄거리 맞추기",
+    "name": "영화 줄거리로 제목 맞추기",
     "description": "짧은 줄거리를 타이핑하고, 완료 시 객관식 보기를 선택해 제목을 맞춰보세요",
     "sentences": [
       "a lonely boy discovers he is a wizard and enters a hidden school where he faces a dark foe",
