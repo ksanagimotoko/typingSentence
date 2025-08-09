@@ -236,9 +236,39 @@
       "you enjoy your picnic"
     ]
   },
-  "realEnglish": {
+  "oneSyllable": {
     "level": 7,
-    "name": "실제 영어 문장 연습",
+    "name": "1음절 단어 연습",
+    "description": "짧은 1음절 단어를 타이핑합니다",
+    "sentences": [
+      "cat","dog","sun","moon","star","sky","rain","cloud","wind","snow",
+      "leaf","tree","bird","fish","frog","wolf","bear","fox","cow","pig",
+      "milk","bread","salt","egg","rice","soup","game","book","pen","desk"
+    ]
+  },
+  "twoSyllable": {
+    "level": 8,
+    "name": "2음절 단어 연습",
+    "description": "쉬운 2음절 단어를 타이핑합니다",
+    "sentences": [
+      "table","river","happy","music","paper","color","picture","window","garden","summer",
+      "winter","people","coffee","mother","father","yellow","quiet","little","candy","market",
+      "pencil","button","apple","baby","city","movie","story","cookie","danger","open"
+    ]
+  },
+  "threeSyllable": {
+    "level": 9,
+    "name": "3음절 단어 연습",
+    "description": "기본 3음절 단어를 타이핑합니다",
+    "sentences": [
+      "animal","banana","computer","holiday","family","energy","beautiful","chocolate","tomato","potato",
+      "remember","tomorrow","library","pottery","gallery","history","memory","favorite","camera","cucumber",
+      "positive","negative","delicate","umbrella","medicine","lemonade","strawberry","october","elephant","butterfly"
+    ]
+  },
+    "realEnglish": {
+      "level": 10,
+      "name": "실제 영어 문장 연습",
     "description": "실제 상황에서 사용되는 영어 문장들",
     "sentences": [
       "Camels use the fat for energy.",
@@ -304,7 +334,7 @@
     ]
   },
   "alnumPractice": {
-    "level": 8,
+    "level": 11,
     "name": "숫자+영문 혼합 연습",
     "description": "숫자와 영문이 섞인 문장을 타이핑합니다",
     "sentences": [
@@ -346,7 +376,7 @@
     ]
   },
   "movieQuiz": {
-    "level": 9,
+    "level": 12,
     "name": "영화 줄거리로 제목 맞추기",
     "description": "짧은 줄거리를 타이핑하고, 완료 시 객관식 보기를 선택해 제목을 맞춰보세요",
     "sentences": [
