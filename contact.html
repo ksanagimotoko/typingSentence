@@ -445,12 +445,12 @@
 
             <div class="contact-content">
                 <div class="contact-info">
-                    <h2>📧 이메일로 문의하기</h2>
+                    <h2>📨 인스타그램 DM으로 문의하기</h2>
                     <div class="email-section">
-                        <h3>📬 직접 이메일 보내기</h3>
-                        <div class="email-address">jonghyopark@icloud.com</div>
+                        <h3>📬 인스타그램 계정</h3>
+                        <div class="email-address"><a href="https://instagram.com/sirangpjh" target="_blank" rel="noopener">@sirangpjh</a></div>
                         <div class="email-note">
-                            위 이메일 주소로 직접 문의사항을 보내주시면 빠른 시일 내에 답변드리겠습니다.<br>
+                            위 인스타그램 계정으로 DM을 보내주세요. 가능한 한 빠르게 답변드리겠습니다.<br>
                             타이핑 연습 관련 질문, 기능 개선 제안, 버그 신고 등 어떤 내용이든 환영합니다.
                         </div>
                     </div>
@@ -562,7 +562,7 @@
             </div>
             <div class="footer-section">
                 <h3>문의하기</h3>
-                <p>이메일: jonghyopark@icloud.com</p>
+                <p>Instagram: <a href="https://instagram.com/sirangpjh" target="_blank" rel="noopener">@sirangpjh</a></p>
                 <div class="social-links">
                     <a href="#" target="_blank">Facebook</a>
                     <a href="#" target="_blank">Twitter</a>
@@ -610,12 +610,13 @@
 ${data.message}
             `);
             
-            const mailtoLink = `mailto:jonghyopark@icloud.com?subject=${subject}&body=${body}`;
-            window.open(mailtoLink);
+            // 인스타그램 DM 유도
+            const ig = 'https://instagram.com/sirangpjh';
+            window.open(ig, '_blank');
             
             // 폼 초기화
             this.reset();
-            alert('문의 양식이 이메일 클라이언트로 전송되었습니다. 이메일을 확인해주세요.');
+            alert('문의 내용을 복사해 인스타그램 DM(@sirangpjh)으로 보내주세요. 창이 열립니다.');
         });
     </script>
 </body>
