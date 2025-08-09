@@ -1,5 +1,6 @@
 window.sentenceCategories = {
   middleRow: {
+    color: "red",
     level: 2,
     name: "중간 행 키보드 연습",
     description: "중간 행 키보드 자판 연습을 위한 문장들",
@@ -57,6 +58,7 @@ window.sentenceCategories = {
     ]
   },
   middleRowLetters: {
+    color: "blue",
     level: 1,
     name: "중간 행 알파벳 연습",
     description: "중간 행의 각 알파벳을 하나씩 타이핑합니다",
@@ -69,6 +71,7 @@ window.sentenceCategories = {
     ]
   },
   topRow: {
+    color: "green",
     level: 3,
     name: "상단 행 키보드 연습",
     description: "상단 행 키보드 자판 연습을 위한 문장들",
@@ -126,6 +129,7 @@ window.sentenceCategories = {
     ]
   },
   bottomRow: {
+    color: "yellow",
     level: 4,
     name: "하단 행 키보드 연습",
     description: "하단 행 키보드 자판 연습을 위한 문장들",
@@ -183,6 +187,7 @@ window.sentenceCategories = {
     ]
   },
   realEnglish: {
+    color: "purple",
     level: 5,
     name: "실제 영어 문장 연습",
     description: "실제 상황에서 사용되는 영어 문장들",

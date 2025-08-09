@@ -60,6 +60,7 @@
         <div class="header">
             <h1>타이핑 연습</h1>
             <p>문장을 따라 타이핑하여 속도와 정확도를 향상시켜보세요!</p>
+            <div id="levelBadge" class="level-badge" aria-live="polite"></div>
         </div>
 
         <div class="category-menu" id="categoryMenu">
@@ -85,6 +86,7 @@
         <div class="progress-bar">
             <div class="progress-fill" id="progress"></div>
         </div>
+        <div class="remaining-info" id="remainingInfo"></div>
 
         <div class="typing-content">
             <div class="sentence-display" id="sentenceDisplay">
@@ -145,6 +147,8 @@
             <p>&copy; 2024 타이핑북. All rights reserved.</p>
         </div>
     </footer>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <script src="sentences.js"></script>
     <script src="app.js"></script>

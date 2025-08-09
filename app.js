@@ -329,6 +329,9 @@ let correctWords = 0;
 let errorWords = [];
 let sessionErrors = [];
 
+// 기본 배경 저장
+let defaultBodyBackground = '';
+
 // 테스트 모드: true면 각 단계의 10% 완료 시 다음 단계로 이동
 let isTestMode = true; // 필요 시 URL 파라미터나 로컬스토리지로 제어 가능
 const TEST_MODE_THRESHOLD_RATIO = 0.1;
@@ -345,6 +348,8 @@ function goToCategory(newKey, keepSession = true) {
         accuracyIndicator.textContent = '';
     }
     updateDisplay();
+    updateLevelBadge();
+    applyCategoryTheme();
     if (keepSession && isTyping && !timer) {
         startTimer();
     }
@@ -378,6 +383,7 @@ function initializeCategoryMenu() {
             categoryMenu.style.display = 'none';
             typingArea.classList.add('active');
             updateDisplay();
+            updateLevelBadge();
         });
 
         categoryMenu.appendChild(card);
@@ -400,6 +406,69 @@ function backToMenu() {
     categoryMenu.style.display = 'grid';
     typingArea.classList.remove('active');
     resetTyping();
+    resetDefaultTheme();
+}
+
+function showToast(message, durationMs = 1500) {
+    if (!toastEl) return;
+    toastEl.textContent = message;
+    toastEl.classList.add('show');
+    window.clearTimeout(showToast._t);
+    showToast._t = window.setTimeout(() => {
+        toastEl.classList.remove('show');
+    }, durationMs);
+}
+
+function updateLevelBadge() {
+    if (!levelBadge) return;
+    if (!currentCategory) {
+        levelBadge.style.display = 'none';
+        return;
+    }
+    const cat = sentenceCategories[currentCategory];
+    const levelText = typeof cat.level === 'number' ? `레벨 ${cat.level}` : '레벨 -';
+    levelBadge.textContent = `${levelText} • ${cat.name}`;
+    levelBadge.style.display = 'inline-block';
+}
+
+function applyCategoryTheme() {
+    const cat = currentCategory ? sentenceCategories[currentCategory] : null;
+    if (!defaultBodyBackground) {
+        defaultBodyBackground = document.body.style.background || '';
+    }
+    // 부드러운 전환 적용
+    document.body.style.transition = 'background 300ms ease';
+
+    // gradient 우선, 없으면 color
+    const gradient = cat && cat.gradient;
+    const color = cat && cat.color;
+
+    if (gradient) {
+        document.body.style.background = gradient;
+    } else if (color) {
+        document.body.style.background = color;
+    } else {
+        document.body.style.background = defaultBodyBackground;
+    }
+
+    // 다크 모드 보정: 시스템 다크 모드면 colorDark/gradientDark 우선 적용
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        const gradientDark = cat && cat.gradientDark;
+        const colorDark = cat && cat.colorDark;
+        if (gradientDark) {
+            document.body.style.background = gradientDark;
+        } else if (colorDark) {
+            document.body.style.background = colorDark;
+        }
+    }
+}
+
+function resetDefaultTheme() {
+    if (defaultBodyBackground) {
+        document.body.style.background = defaultBodyBackground;
+    } else {
+        document.body.style.background = '';
+    }
 }
 
 const sentenceDisplay = document.getElementById('sentenceDisplay');
@@ -412,12 +481,29 @@ const accuracyDisplay = document.getElementById('accuracy');
 const timerDisplay = document.getElementById('timer');
 const progressBar = document.getElementById('progress');
 const accuracyIndicator = document.getElementById('accuracyIndicator');
+const remainingInfo = document.getElementById('remainingInfo');
+const levelBadge = document.getElementById('levelBadge');
+const toastEl = document.getElementById('toast');
 
 function updateDisplay() {
     if (!currentCategory) return;
     const currentSentences = sentenceCategories[currentCategory].sentences;
     sentenceDisplay.innerHTML = `<span class="current-sentence">${currentSentences[currentSentenceIndex]}</span>`;
     progressBar.style.width = `${((currentSentenceIndex + 1) / currentSentences.length) * 100}%`;
+
+    // 남은 문장 수 표시 (테스트 모드에서는 임계치까지 남은 개수)
+    if (remainingInfo) {
+        let remaining;
+        if (isTestMode) {
+            const threshold = Math.max(1, Math.ceil(currentSentences.length * TEST_MODE_THRESHOLD_RATIO));
+            const done = Math.min(currentSentenceIndex + 1, threshold);
+            remaining = Math.max(0, threshold - done);
+            remainingInfo.textContent = `다음 단계까지 남은 문장: ${remaining} (테스트)`;
+        } else {
+            remaining = currentSentences.length - (currentSentenceIndex + 1);
+            remainingInfo.textContent = `다음 단계까지 남은 문장: ${remaining}`;
+        }
+    }
 }
 
 function shouldAutoAdvanceInTestMode() {
@@ -539,10 +625,9 @@ function nextSentence() {
                 // 시작 버튼을 누르지 않았어도 다음 레벨 자동 시작
                 startTyping();
             }
-            alert(`${sentenceCategories[nextKey].name} 단계로 이동합니다.`);
+            showToast(`${sentenceCategories[nextKey].name} 단계로 이동합니다.`)
         } else {
             saveSessionStats();
-            alert('축하합니다! 모든 단계가 완료되었습니다!');
             pauseTyping();
         }
     }
@@ -618,10 +703,9 @@ typingInput.addEventListener('input', (e) => {
                             // 시작 버튼을 누르지 않았어도 다음 레벨 자동 시작
                             startTyping();
                         }
-                        alert(`${sentenceCategories[nextKey].name} 단계로 이동합니다.`);
+                        showToast(`${sentenceCategories[nextKey].name} 단계로 이동합니다.`)
                     } else {
                         saveSessionStats();
-                        alert('축하합니다! 모든 단계가 완료되었습니다!');
                         pauseTyping();
                     }
                 }
