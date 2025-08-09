@@ -772,6 +772,34 @@ function playErrorBeep() {
     }
 }
 
+let lastSuccessAt = 0;
+function playSuccessTone() {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        if (!audioContext) audioContext = new AudioCtx();
+        // 스로틀: 30ms
+        const nowMs = Date.now();
+        if (nowMs - lastSuccessAt < 30) return;
+        lastSuccessAt = nowMs;
+
+        const duration = 0.09; // 90ms
+        const now = audioContext.currentTime;
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(220, now); // 저음 A3 근처
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.15, now + 0.005);
+        gain.gain.linearRampToValueAtTime(0.0, now + duration);
+        osc.connect(gain).connect(audioContext.destination);
+        osc.start(now);
+        osc.stop(now + duration + 0.02);
+    } catch (_) {
+        // ignore
+    }
+}
+
 typingInput.addEventListener('input', (e) => {
     if (!currentCategory) return;
 
@@ -815,6 +843,9 @@ typingInput.addEventListener('input', (e) => {
                 updateStats();
             }
 
+            // 문장 완성 성공음
+            playSuccessTone();
+
             setTimeout(() => {
                 const isLastSentence = currentSentenceIndex >= sentenceCategories[currentCategory].sentences.length - 1;
                 if (!isLastSentence && !shouldAutoAdvanceInTestMode()) {
@@ -840,7 +871,11 @@ typingInput.addEventListener('input', (e) => {
             e.target.classList.remove('incorrect');
             e.target.classList.remove('correct');
             // 부분 정답 진행 카운트만 업데이트
-            if (input.length > asciiLastCorrectCharCount) asciiLastCorrectCharCount = input.length;
+            if (input.length > asciiLastCorrectCharCount) {
+                asciiLastCorrectCharCount = input.length;
+                // 올바르게 한 글자 진행될 때 부드러운 성공음
+                playSuccessTone();
+            }
         } else {
             e.target.classList.add('incorrect');
             e.target.classList.remove('correct');
