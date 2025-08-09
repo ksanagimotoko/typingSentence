@@ -182,8 +182,62 @@
       "Ben had milk with cake."
     ]
   },
-  "realEnglish": {
+  "leftHand": {
     "level": 5,
+    "name": "왼손 타이핑 연습",
+    "description": "왼손(Q W E R T A S D F G Z X C V B)으로 입력 가능한 단어들로 구성된 문장",
+    "sentences": [
+      "we were as fast as water",
+      "we saw vast sea waves",
+      "a safe cave was at east",
+      "we craft a great cast",
+      "a brave saver was at base",
+      "we were at a cafe at east",
+      "a star was at a vast area",
+      "we set a safe case",
+      "a sweet tea was great",
+      "we were as brave as we are",
+      "we trade as we save",
+      "as we craft, we taste",
+      "we sweep a cave base",
+      "we seat at a safe area",
+      "we start a great task",
+      "a brave sea avatar",
+      "we were at a great cave",
+      "we save as we serve",
+      "as we create, we rest",
+      "we taste a sweet tea"
+    ]
+  },
+  "rightHand": {
+    "level": 6,
+    "name": "오른손 타이핑 연습",
+    "description": "오른손(Y U I O P H J K L N M)으로 입력 가능한 단어들로 구성된 문장",
+    "sentences": [
+      "you look cool you joy",
+      "you join your kin",
+      "pony moon pool noon",
+      "i like milk i like oil",
+      "you like jelly you like honey",
+      "mini mono link hill",
+      "you enjoy your hobby",
+      "join your kind club",
+      "you pile jelly on hill",
+      "you jog in noon",
+      "you play piano only",
+      "you like yummy milk",
+      "you look kindly on him",
+      "you join your loyal kin",
+      "you pull long nylon",
+      "you link on your log",
+      "you hunt on hilly land",
+      "you enjoy holy hymn",
+      "you look on moon",
+      "you enjoy your picnic"
+    ]
+  },
+  "realEnglish": {
+    "level": 7,
     "name": "실제 영어 문장 연습",
     "description": "실제 상황에서 사용되는 영어 문장들",
     "sentences": [
