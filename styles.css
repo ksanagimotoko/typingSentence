@@ -201,6 +201,12 @@ main {
     align-items: center;
 }
 
+#sentenceDisplay {
+    white-space: pre;           /* 자동 줄바꿈 해제, 공백 그대로 */
+    word-break: normal;         /* 단어 강제 줄바꿈 해제 */
+    overflow-wrap: normal;      /* 어디서든 줄바꿈 해제 */
+}
+
 .current-sentence {
     font-weight: bold;
     color: #667eea;

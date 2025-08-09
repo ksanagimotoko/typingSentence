@@ -418,6 +418,9 @@ function backToMenu() {
     typingArea.classList.remove('active');
     resetTyping();
     resetDefaultTheme();
+    // 컨테이너 폭 초기화
+    const container = document.querySelector('.container');
+    if (container) container.style.maxWidth = '';
 }
 
 function showToast(message, durationMs = 1500) {
@@ -705,6 +708,8 @@ function updateDisplay() {
     const currentSentences = sentenceCategories[currentCategory].sentences;
     const targetText = currentSentences[currentSentenceIndex];
     renderSentenceHighlight(targetText, typingInput ? typingInput.value : '');
+    // 문장 길이에 따른 컨테이너 폭 조정
+    setContainerWidthForSentence(targetText);
     // 영화 제목 노출 초기화
     clearMovieTitleReveal();
     progressBar.style.width = `${((currentSentenceIndex + 1) / currentSentences.length) * 100}%`;
@@ -1199,3 +1204,54 @@ function getHighlightForCategory(key) {
     // 실전은 하이라이트 없음
     return 'none';
 } 
+
+function setContainerWidthForSentence(text) {
+    const container = document.querySelector('.container');
+    if (!container) return;
+    const viewport = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    // 작은 화면에서는 확장하지 않음
+    if (viewport < 900) {
+        container.style.maxWidth = '';
+        return;
+    }
+    // 실제 픽셀 폭 측정
+    const measure = document.createElement('span');
+    // sentenceDisplay가 존재한다면 해당 스타일을 참조
+    if (sentenceDisplay) {
+        const cs = window.getComputedStyle(sentenceDisplay);
+        measure.style.fontFamily = cs.fontFamily;
+        measure.style.fontSize = cs.fontSize;
+        measure.style.fontWeight = cs.fontWeight;
+        measure.style.letterSpacing = cs.letterSpacing;
+    }
+    measure.style.whiteSpace = 'pre';
+    measure.style.visibility = 'hidden';
+    measure.style.position = 'absolute';
+    measure.style.left = '-9999px';
+    measure.style.top = '-9999px';
+    measure.textContent = text || '';
+    document.body.appendChild(measure);
+    const textWidth = measure.offsetWidth;
+    document.body.removeChild(measure);
+
+    // 컨테이너/문장 패딩 등을 고려한 여유 폭(약 200px)
+    let desired = textWidth + 200;
+    // 최소/최대 한계
+    if (desired < 800) desired = 800;
+    if (desired > 1600) desired = 1600;
+    container.style.maxWidth = `${Math.round(desired)}px`;
+} 
+
+// 현재 타깃 문장 반환 헬퍼
+function getCurrentTargetText() {
+    if (!currentCategory) return '';
+    const sentences = sentenceCategories[currentCategory]?.sentences;
+    if (!Array.isArray(sentences)) return '';
+    return sentences[currentSentenceIndex] || '';
+}
+
+// 리사이즈 시 폭 재계산
+window.addEventListener('resize', () => {
+    const t = getCurrentTargetText();
+    if (t) setContainerWidthForSentence(t);
+}); 
