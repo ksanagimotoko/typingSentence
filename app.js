@@ -1,4 +1,4 @@
-const sentenceCategories = window.sentenceCategories || {
+let sentenceCategories = window.sentenceCategories || {
     middleRow: {
         name: "중간 행 키보드 연습",
         description: "중간 행 키보드 자판 연습을 위한 문장들",
@@ -431,6 +431,14 @@ function updateLevelBadge() {
     levelBadge.style.display = 'inline-block';
 }
 
+const defaultThemeByLevel = {
+    1: { gradient: 'linear-gradient(135deg, #e0f7ff 0%, #b3e5fc 100%)', gradientDark: 'linear-gradient(135deg, #0d47a1 0%, #1565c0 100%)' },
+    2: { gradient: 'linear-gradient(135deg, #ede7f6 0%, #d1c4e9 100%)', gradientDark: 'linear-gradient(135deg, #4527a0 0%, #5e35b1 100%)' },
+    3: { gradient: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)', gradientDark: 'linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%)' },
+    4: { gradient: 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)', gradientDark: 'linear-gradient(135deg, #e65100 0%, #ef6c00 100%)' },
+    5: { gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', gradientDark: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)' }
+};
+
 function applyCategoryTheme() {
     const cat = currentCategory ? sentenceCategories[currentCategory] : null;
     if (!defaultBodyBackground) {
@@ -440,7 +448,7 @@ function applyCategoryTheme() {
     document.body.style.transition = 'background 300ms ease';
 
     // gradient 우선, 없으면 color
-    const gradient = cat && cat.gradient;
+    const gradient = cat && (cat.gradient || (cat.level && defaultThemeByLevel[cat.level]?.gradient));
     const color = cat && cat.color;
 
     if (gradient) {
@@ -453,7 +461,7 @@ function applyCategoryTheme() {
 
     // 다크 모드 보정: 시스템 다크 모드면 colorDark/gradientDark 우선 적용
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        const gradientDark = cat && cat.gradientDark;
+        const gradientDark = cat && (cat.gradientDark || (cat.level && defaultThemeByLevel[cat.level]?.gradientDark));
         const colorDark = cat && cat.colorDark;
         if (gradientDark) {
             document.body.style.background = gradientDark;
@@ -743,5 +751,21 @@ backButton.addEventListener('click', backToMenu);
 
 document.querySelector('.controls').insertBefore(backButton, startBtn);
 
+async function loadSentences() {
+    try {
+        const res = await fetch('sentences.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to load sentences.json');
+        const data = await res.json();
+        sentenceCategories = data;
+    } catch (err) {
+        console.error('[loadSentences] ', err);
+    }
+}
+
+async function bootstrap() {
+    await loadSentences();
+    initializeCategoryMenu();
+}
+
 // 초기화
-document.addEventListener('DOMContentLoaded', initializeCategoryMenu); 
+document.addEventListener('DOMContentLoaded', bootstrap); 
