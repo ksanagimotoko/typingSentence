@@ -302,5 +302,35 @@
       "A glow stick is put in a plastic tube, and in a glow stick, two kinds of liquid are in separate areas.",
       "If you touch electrical devices with a wet hand, you may get an electric shock."
     ]
+  },
+  "movieQuiz": {
+    "level": 9,
+    "name": "영화 줄거리 맞추기",
+    "description": "짧은 줄거리를 타이핑하고, 완료 시 객관식 보기를 선택해 제목을 맞춰보세요",
+    "sentences": [
+      "a lonely boy discovers he is a wizard and enters a hidden school where he faces a dark foe",
+      "to destroy an ancient ring, friends travel across a dangerous land chased by evil",
+      "a gentle alien is stranded on earth and a boy helps it hide and find a way home",
+      "on its first voyage a grand ship strikes ice and people struggle to survive",
+      "a group of toys set out on a rescue to bring a lost friend back home",
+      "a hero in a bat suit faces a clever clown who spreads chaos in a dark city",
+      "a small fish dad crosses the ocean to find his missing son",
+      "a man shrinks to tiny size and explores a hidden world to stop a plot",
+      "a space crew fights a dark empire led by a masked lord",
+      "a curious girl falls through a hole into a strange land of wonders"
+    ],
+    "choices": [
+      ["Harry Potter", "Percy Jackson", "The Chronicles of Narnia", "Fantastic Beasts"],
+      ["The Hobbit", "The Lord of the Rings", "Willow", "Eragon"],
+      ["E.T.", "Close Encounters", "Home Alone", "Super 8"],
+      ["Titanic", "Master and Commander", "The Perfect Storm", "Ghost Ship"],
+      ["Toy Story", "Inside Out", "The Incredibles", "Up"],
+      ["The Dark Knight", "Batman Begins", "Joker", "The Batman"],
+      ["Finding Nemo", "Shark Tale", "Moana", "Luca"],
+      ["Ant-Man", "Honey, I Shrunk the Kids", "Downsizing", "The Wasp"],
+      ["Star Trek", "Star Wars", "Guardians of the Galaxy", "Dune"],
+      ["Spirited Away", "Alice in Wonderland", "Coraline", "Peter Pan"]
+    ],
+    "answers": [0,1,0,0,0,0,0,0,1,1]
   }
 } 

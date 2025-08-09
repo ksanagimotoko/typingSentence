@@ -675,11 +675,38 @@ function renderSentenceHighlight(target, input) {
     sentenceDisplay.innerHTML = `<span class="typed-correct">${correct}</span>${rest}`;
 }
 
+function clearMovieTitleReveal() {
+    const existing = document.getElementById('movieTitleReveal');
+    if (existing) existing.remove();
+}
+function revealMovieTitleAtIndex(index) {
+    if (currentCategory !== 'movieQuiz') return;
+    const cat = sentenceCategories[currentCategory];
+    const titles = cat && cat.titles;
+    if (!Array.isArray(titles) || !titles[index]) return;
+    const title = titles[index];
+    // 타이틀 엘리먼트 생성 및 삽입
+    clearMovieTitleReveal();
+    const el = document.createElement('div');
+    el.id = 'movieTitleReveal';
+    el.textContent = `정답: "${title}"`;
+    el.style.marginTop = '8px';
+    el.style.fontWeight = '700';
+    el.style.color = '#2b6cb0';
+    el.style.fontSize = '0.95rem';
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 200ms ease';
+    sentenceDisplay.appendChild(el);
+    requestAnimationFrame(() => { el.style.opacity = '1'; });
+}
+
 function updateDisplay() {
     if (!currentCategory) return;
     const currentSentences = sentenceCategories[currentCategory].sentences;
     const targetText = currentSentences[currentSentenceIndex];
     renderSentenceHighlight(targetText, typingInput ? typingInput.value : '');
+    // 영화 제목 노출 초기화
+    clearMovieTitleReveal();
     progressBar.style.width = `${((currentSentenceIndex + 1) / currentSentences.length) * 100}%`;
 
     // 남은 문장 수 표시 (테스트 모드에서는 임계치까지 남은 개수)
@@ -905,6 +932,77 @@ function playSuccessTone() {
     }
 }
 
+let movieChoicesActive = false;
+function clearMovieChoices() {
+    const el = document.getElementById('movieChoices');
+    if (el) el.remove();
+    movieChoicesActive = false;
+}
+function showMovieChoicesAtIndex(index) {
+    if (currentCategory !== 'movieQuiz') return;
+    const cat = sentenceCategories[currentCategory];
+    const choices = Array.isArray(cat.choices) ? cat.choices[index] : null;
+    if (!choices || choices.length === 0) return;
+    clearMovieChoices();
+    const wrap = document.createElement('div');
+    wrap.id = 'movieChoices';
+    wrap.style.marginTop = '6px';
+    wrap.style.display = 'grid';
+    wrap.style.gridTemplateColumns = '1fr 1fr';
+    wrap.style.gap = '6px';
+    choices.forEach((c, i) => {
+        const btn = document.createElement('button');
+        btn.textContent = `${i + 1}. ${c}`;
+        btn.style.padding = '6px 8px';
+        btn.style.border = '1px solid #cbd5e1';
+        btn.style.borderRadius = '8px';
+        btn.style.background = '#fff';
+        btn.style.cursor = 'pointer';
+        btn.addEventListener('click', () => verifyMovieAnswer(index, i));
+        wrap.appendChild(btn);
+    });
+    sentenceDisplay.appendChild(wrap);
+    movieChoicesActive = true;
+}
+function verifyMovieAnswer(index, selectedIdx) {
+    const cat = sentenceCategories[currentCategory];
+    const correctIdx = Array.isArray(cat.answers) ? cat.answers[index] : -1;
+    const isCorrect = selectedIdx === correctIdx;
+    showToast(isCorrect ? '정답!' : '오답!');
+    setTimeout(() => {
+        askContinueOrExit();
+    }, 500);
+}
+function onMovieNumberKey(e) {
+    if (!movieChoicesActive) return;
+    const key = e.key;
+    if (!/^[1-9]$/.test(key)) return;
+    const wrap = document.getElementById('movieChoices');
+    if (!wrap) return;
+    const idx = parseInt(key, 10) - 1;
+    const btns = wrap.querySelectorAll('button');
+    if (idx >= 0 && idx < btns.length) {
+        btns[idx].click();
+    }
+}
+function askContinueOrExit() {
+    const cont = confirm('계속하시겠습니까? 취소를 누르면 메뉴로 돌아갑니다.');
+    if (cont) {
+        clearMovieTitleReveal();
+        clearMovieChoices();
+        nextSentence();
+        focusTypingInput();
+    } else {
+        // 메뉴로 복귀
+        clearMovieTitleReveal();
+        clearMovieChoices();
+        backToMenu();
+        focusTypingInput();
+    }
+}
+// 번호키로 보기 선택 핸들러 등록
+window.addEventListener('keydown', onMovieNumberKey);
+
 typingInput.addEventListener('input', (e) => {
     if (!currentCategory) return;
 
@@ -955,19 +1053,22 @@ typingInput.addEventListener('input', (e) => {
             // 문장 완성 성공음
             playSuccessTone();
             showEncourage('success');
+            // 영화 퀴즈일 경우 제목 노출
+            revealMovieTitleAtIndex(currentSentenceIndex);
+            // 그리고 객관식 보기 표시
+            showMovieChoicesAtIndex(currentSentenceIndex);
 
             setTimeout(() => {
                 const isLastSentence = currentSentenceIndex >= sentenceCategories[currentCategory].sentences.length - 1;
                 if (!isLastSentence && !shouldAutoAdvanceInTestMode()) {
-                    nextSentence(); // updateDisplay() 안에서 다음 문장에 맞게 동물이 자동 재선택됨
+                    // 영화 퀴즈는 자동 다음 문장으로 가지 않고, 계속 여부를 묻는다
+                    // nextSentence();
                 } else {
                     const nextKey = getNextCategoryKey(currentCategory);
                     if (nextKey) {
-                        // 현재 단계 통계 저장 후 다음 단계로 이동
                         saveSessionStats();
                         goToCategory(nextKey, true);
                         if (!isTyping) {
-                            // 시작 버튼을 누르지 않았어도 다음 레벨 자동 시작
                             startTyping();
                         }
                         showToast(`${sentenceCategories[nextKey].name} 단계로 이동합니다.`)
@@ -976,7 +1077,7 @@ typingInput.addEventListener('input', (e) => {
                         pauseTyping();
                     }
                 }
-            }, 200);
+            }, 0);
         } else if (target.startsWith(input)) {
             e.target.classList.remove('incorrect');
             e.target.classList.remove('correct');
