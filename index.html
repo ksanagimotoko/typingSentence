@@ -1079,7 +1079,7 @@
         }
 
         typingInput.addEventListener('input', (e) => {
-            if (!isTyping || !currentCategory) return;
+            if (!currentCategory) return;
 
             const input = e.target.value;
             const target = sentenceCategories[currentCategory].sentences[currentSentenceIndex];
@@ -1107,19 +1107,25 @@
                 if (input === target) {
                     e.target.classList.add('correct');
                     e.target.classList.remove('incorrect');
-                    correctWords += target.split(/\s+/).length;
-                    totalWords += target.split(/\s+/).length;
-                    updateStats();
+
+                    // 통계는 타이핑 세션이 시작된 상태일 때만 집계
+                    if (isTyping) {
+                        correctWords += target.split(/\s+/).length;
+                        totalWords += target.split(/\s+/).length;
+                        updateStats();
+                    }
                     
                     setTimeout(() => {
                         if (currentSentenceIndex < sentenceCategories[currentCategory].sentences.length - 1) {
                             nextSentence();
                         } else {
-                            saveSessionStats();
-                            alert('축하합니다! 모든 문장을 완료했습니다!');
-                            pauseTyping();
+                            if (isTyping) {
+                                saveSessionStats();
+                                alert('축하합니다! 모든 문장을 완료했습니다!');
+                                pauseTyping();
+                            }
                         }
-                    }, 500);
+                    }, 300);
                 } else if (target.startsWith(input)) {
                     e.target.classList.remove('incorrect');
                     e.target.classList.remove('correct');
