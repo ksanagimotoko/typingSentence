@@ -544,6 +544,7 @@ main {
     line-height: 1.1;
     color: #333;
     overflow: hidden;
+    height: 140px; /* 고정 높이 */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -551,7 +552,13 @@ main {
         background: rgba(255,255,255,0.08);
         color: #e6e6e6;
     }
-} 
+}
+
+@media (max-width: 480px) {
+    .ascii-runner {
+        height: 110px; /* 모바일에서 약간 낮게 */
+    }
+}
 
 @keyframes ascii-shake {
     0% { transform: translateX(0); }
