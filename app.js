@@ -1153,24 +1153,10 @@ typingInput.addEventListener('input', (e) => {
             showMovieChoicesAtIndex(currentSentenceIndex);
 
             setTimeout(() => {
-                const isLastSentence = currentSentenceIndex >= sentenceCategories[currentCategory].sentences.length - 1;
-                if (!isLastSentence && !shouldAutoAdvanceInTestMode()) {
-                    // 영화 퀴즈는 자동 다음 문장으로 가지 않고, 계속 여부를 묻는다
-                    // nextSentence();
-                } else {
-                    const nextKey = getNextCategoryKey(currentCategory);
-                    if (nextKey) {
-                        saveSessionStats();
-                        goToCategory(nextKey, true);
-                        if (!isTyping) {
-                            startTyping();
-                        }
-                        showToast(`${sentenceCategories[nextKey].name} 단계로 이동합니다.`)
-                    } else {
-                        saveSessionStats();
-                        pauseTyping();
-                    }
+                if (currentCategory === 'movieQuiz') {
+                    return; // 영화 퀴즈는 버튼으로 계속/종료를 결정
                 }
+                nextSentence();
             }, 0);
         } else if (target.startsWith(input)) {
             e.target.classList.remove('incorrect');
