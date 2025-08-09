@@ -612,3 +612,7 @@ main {
     height: auto;
     display: block;
 } 
+
+.typed-correct {
+    color: #9aa0a6;
+} 

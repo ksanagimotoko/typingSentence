@@ -661,10 +661,25 @@ function showEncourage(kind = 'general') {
     encourageEl.classList.add('fade-in');
 }
 
+function renderSentenceHighlight(target, input) {
+    if (!sentenceDisplay) return;
+    const escape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const max = Math.min(target.length, input.length);
+    let idx = 0;
+    while (idx < max && target[idx] === input[idx]) idx++;
+    let correct = escape(target.slice(0, idx));
+    let rest = escape(target.slice(idx));
+    // 공백 보존: 일반 공백을 &nbsp;로 치환해 경계 공백 소실 방지
+    correct = correct.replace(/ /g, '&nbsp;');
+    rest = rest.replace(/ /g, '&nbsp;');
+    sentenceDisplay.innerHTML = `<span class="typed-correct">${correct}</span>${rest}`;
+}
+
 function updateDisplay() {
     if (!currentCategory) return;
     const currentSentences = sentenceCategories[currentCategory].sentences;
-    sentenceDisplay.innerHTML = `<span class="current-sentence">${currentSentences[currentSentenceIndex]}</span>`;
+    const targetText = currentSentences[currentSentenceIndex];
+    renderSentenceHighlight(targetText, typingInput ? typingInput.value : '');
     progressBar.style.width = `${((currentSentenceIndex + 1) / currentSentences.length) * 100}%`;
 
     // 남은 문장 수 표시 (테스트 모드에서는 임계치까지 남은 개수)
@@ -895,6 +910,9 @@ typingInput.addEventListener('input', (e) => {
 
     const input = e.target.value;
     const target = sentenceCategories[currentCategory].sentences[currentSentenceIndex];
+
+    // 문장 하이라이트 갱신
+    renderSentenceHighlight(target, input);
 
     // 키 입력마다 프레임 업데이트 (요청 사항)
     updateAsciiRunner(false);
