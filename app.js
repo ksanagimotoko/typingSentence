@@ -333,7 +333,7 @@ let sessionErrors = [];
 let defaultBodyBackground = '';
 
 // 테스트 모드: true면 각 단계의 10% 완료 시 다음 단계로 이동
-let isTestMode = true; // 필요 시 URL 파라미터나 로컬스토리지로 제어 가능
+let isTestMode = false; // 필요 시 URL 파라미터나 로컬스토리지로 제어 가능
 const TEST_MODE_THRESHOLD_RATIO = 0.1;
 
 function goToCategory(newKey, keepSession = true) {
