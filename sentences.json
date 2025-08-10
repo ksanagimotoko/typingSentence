@@ -524,11 +524,23 @@
     "description": "대한민국 헌법의 주요 조항들을 타이핑하여 연습합니다",
     "sentences": [
       "The Republic of Korea shall be a democratic republic.",
-      "The sovereignty of the Republic of Korea shall reside in the people, and all state authority shall emanate from the people."
+      "The sovereignty of the Republic of Korea shall reside in the people, and all state authority shall emanate from the people.",
+      "Nationality in the Republic of Korea shall be prescribed by Act.",
+      "It shall be the duty of the State to protect citizens residing abroad as prescribed by Act.",
+      "The territory of the Republic of Korea shall consist of the Korean peninsula and its adjacent islands.",
+      "The Republic of Korea shall seek unification and shall formulate and carry out a policy of peaceful unification based on the basic free and democratic order.",
+      "The Republic of Korea shall endeavor to maintain international peace and shall renounce all aggressive wars.",
+      "The Armed Forces shall be charged with the sacred mission of national security and the defense of the land and their political neutrality shall be maintained."
     ],
     "koreanTranslations": [
       "대한민국은 민주공화국이다.",
-      "대한민국의 주권은 국민에게 있고, 모든 권력은 국민으로부터 나온다."
+      "대한민국의 주권은 국민에게 있고, 모든 권력은 국민으로부터 나온다.",
+      "대한민국의 국민이 되는 요건은 법률로 정한다.",
+      "국가는 법률이 정하는 바에 의하여 재외국민을 보호할 의무를 진다.",
+      "대한민국의 영토는 한반도와 그 부속도서로 한다.",
+      "대한민국은 통일을 지향하며, 자유민주적 기본질서에 입각한 평화적 통일 정책을 수립하고 이를 추진한다.",
+      "대한민국은 국제평화의 유지에 노력하고 침략적 전쟁을 부인한다.",
+      "국군은 국가의 안전보장과 국토방위의 신성한 의무를 수행함을 사명으로 하며, 그 정치적 중립성은 준수된다."
     ]
   },
   "constitutionPreamble": {
