@@ -405,8 +405,8 @@ function initializeCategoryMenu() {
             <h3><span class="category-icon">${icon}</span>${i + 1}. ${category.name}</h3>
             <p>${category.description}</p>
             <div class="category-stats">
-                <span>${category.sentences.length} 문장</span>
-                <span>레벨: ${category.level ?? '-'} / 난이도: ${getDifficulty(category.sentences)}</span>
+                <span>${category.sentences ? category.sentences.length : (category.paragraph ? category.paragraph.length : 0)} 문장</span>
+                <span>레벨: ${category.level ?? '-'} / 난이도: ${getDifficulty(category.sentences || category.paragraph || [])}</span>
             </div>
             ${kb}
         `;
@@ -432,6 +432,7 @@ function initializeCategoryMenu() {
 
 // 카테고리의 난이도 계산
 function getDifficulty(sentences) {
+    if (!sentences || sentences.length === 0) return '보통';
     const avgLength = sentences.reduce((sum, sent) => sum + sent.length, 0) / sentences.length;
     if (avgLength < 30) return '쉬움';
     if (avgLength < 50) return '보통';
@@ -727,8 +728,8 @@ function renderSentenceHighlight(target, input) {
     // sentenceDisplay에는 영어 문장만 표시
     sentenceDisplay.innerHTML = `<span class="typed-correct">${correct}</span>${rest}`;
     
-    // 헌법 카테고리일 때 한글 번역을 sentenceDisplay 아래에 별도로 표시
-    if (currentCategory === 'constitution' && sentenceCategories[currentCategory].koreanTranslations) {
+    // 헌법 관련 카테고리일 때 한글 번역을 sentenceDisplay 아래에 별도로 표시
+    if ((currentCategory === 'constitution' || currentCategory === 'constitutionPreamble') && sentenceCategories[currentCategory].koreanTranslations) {
         const koreanText = sentenceCategories[currentCategory].koreanTranslations[currentSentenceIndex];
         if (koreanText) {
             // 기존 한글 번역 요소가 있으면 제거
@@ -747,7 +748,7 @@ function renderSentenceHighlight(target, input) {
             sentenceDisplay.parentNode.insertBefore(translationDiv, sentenceDisplay.nextSibling);
         }
     } else {
-        // 헌법 카테고리가 아닐 때는 한글 번역 요소 제거
+        // 헌법 관련 카테고리가 아닐 때는 한글 번역 요소 제거
         const existingTranslation = document.getElementById('koreanTranslation');
         if (existingTranslation) {
             existingTranslation.remove();
@@ -799,7 +800,7 @@ function updateDisplay() {
         return;
     }
 
-    const currentSentences = sentenceCategories[currentCategory].sentences;
+    const currentSentences = sentenceCategories[currentCategory].sentences || sentenceCategories[currentCategory].paragraph || [];
     const targetText = currentSentences[currentSentenceIndex];
     renderSentenceHighlight(targetText, typingInput ? typingInput.value : '');
     // 문장 길이에 따른 컨테이너 폭 조정
@@ -830,7 +831,7 @@ function updateDisplay() {
 
 function shouldAutoAdvanceInTestMode() {
     if (!isTestMode) return false;
-    const totalSentences = sentenceCategories[currentCategory].sentences.length;
+    const totalSentences = (sentenceCategories[currentCategory].sentences || sentenceCategories[currentCategory].paragraph || []).length;
     const threshold = Math.max(1, Math.ceil(totalSentences * TEST_MODE_THRESHOLD_RATIO));
     return currentSentenceIndex + 1 >= threshold; // +1은 현재 인덱스가 0부터 시작하므로 진행 개수 보정
 }
@@ -927,7 +928,8 @@ function resetTyping() {
 
 function nextSentence() {
     if (!currentCategory) return;
-    const isLastSentence = currentSentenceIndex >= sentenceCategories[currentCategory].sentences.length - 1;
+    const currentSentences = sentenceCategories[currentCategory].sentences || sentenceCategories[currentCategory].paragraph || [];
+    const isLastSentence = currentSentenceIndex >= currentSentences.length - 1;
 
     if (!isLastSentence) {
         currentSentenceIndex++;
@@ -1385,7 +1387,8 @@ function getCategoryIcon(key, level) {
         twoSyllable: getMouthSVG(2),
         threeSyllable: getMouthSVG(3),
         alphaSprint: '⏱️',
-        constitution: '📜'
+        constitution: '📜',
+        constitutionPreamble: '📋'
     };
     if (map[key]) return map[key];
     // 레벨 색상 대체 아이콘
@@ -1525,7 +1528,7 @@ function setContainerWidthForSentence(text) {
 // 현재 타깃 문장 반환 헬퍼
 function getCurrentTargetText() {
     if (!currentCategory) return '';
-    const sentences = sentenceCategories[currentCategory]?.sentences;
+    const sentences = sentenceCategories[currentCategory]?.sentences || sentenceCategories[currentCategory]?.paragraph;
     if (!Array.isArray(sentences)) return '';
     return sentences[currentSentenceIndex] || '';
 }
