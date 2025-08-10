@@ -723,7 +723,18 @@ function renderSentenceHighlight(target, input) {
     // 공백 보존: 일반 공백을 &nbsp;로 치환해 경계 공백 소실 방지
     correct = correct.replace(/ /g, '&nbsp;');
     rest = rest.replace(/ /g, '&nbsp;');
-    sentenceDisplay.innerHTML = `<span class="typed-correct">${correct}</span>${rest}`;
+    
+    let displayHTML = `<span class="typed-correct">${correct}</span>${rest}`;
+    
+    // 헌법 카테고리일 때 한글 번역도 함께 표시
+    if (currentCategory === 'constitution' && sentenceCategories[currentCategory].koreanTranslations) {
+        const koreanText = sentenceCategories[currentCategory].koreanTranslations[currentSentenceIndex];
+        if (koreanText) {
+            displayHTML += `<div class="korean-translation">${escape(koreanText)}</div>`;
+        }
+    }
+    
+    sentenceDisplay.innerHTML = displayHTML;
 }
 
 function clearMovieTitleReveal() {
@@ -1355,7 +1366,8 @@ function getCategoryIcon(key, level) {
         oneSyllable: getMouthSVG(1),
         twoSyllable: getMouthSVG(2),
         threeSyllable: getMouthSVG(3),
-        alphaSprint: '⏱️'
+        alphaSprint: '⏱️',
+        constitution: '📜'
     };
     if (map[key]) return map[key];
     // 레벨 색상 대체 아이콘
