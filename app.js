@@ -724,17 +724,35 @@ function renderSentenceHighlight(target, input) {
     correct = correct.replace(/ /g, '&nbsp;');
     rest = rest.replace(/ /g, '&nbsp;');
     
-    let displayHTML = `<span class="typed-correct">${correct}</span>${rest}`;
+    // sentenceDisplay에는 영어 문장만 표시
+    sentenceDisplay.innerHTML = `<span class="typed-correct">${correct}</span>${rest}`;
     
-    // 헌법 카테고리일 때 한글 번역도 함께 표시
+    // 헌법 카테고리일 때 한글 번역을 sentenceDisplay 아래에 별도로 표시
     if (currentCategory === 'constitution' && sentenceCategories[currentCategory].koreanTranslations) {
         const koreanText = sentenceCategories[currentCategory].koreanTranslations[currentSentenceIndex];
         if (koreanText) {
-            displayHTML += `<div class="korean-translation">${escape(koreanText)}</div>`;
+            // 기존 한글 번역 요소가 있으면 제거
+            const existingTranslation = document.getElementById('koreanTranslation');
+            if (existingTranslation) {
+                existingTranslation.remove();
+            }
+            
+            // 새로운 한글 번역 요소 생성 및 삽입
+            const translationDiv = document.createElement('div');
+            translationDiv.id = 'koreanTranslation';
+            translationDiv.className = 'korean-translation';
+            translationDiv.innerHTML = escape(koreanText);
+            
+            // sentenceDisplay 다음에 삽입
+            sentenceDisplay.parentNode.insertBefore(translationDiv, sentenceDisplay.nextSibling);
+        }
+    } else {
+        // 헌법 카테고리가 아닐 때는 한글 번역 요소 제거
+        const existingTranslation = document.getElementById('koreanTranslation');
+        if (existingTranslation) {
+            existingTranslation.remove();
         }
     }
-    
-    sentenceDisplay.innerHTML = displayHTML;
 }
 
 function clearMovieTitleReveal() {

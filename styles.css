@@ -624,7 +624,7 @@ main {
 }
 
 .korean-translation {
-    margin-top: 12px;
+    margin-top: 8px;
     padding: 12px 16px;
     background: rgba(102, 126, 234, 0.1);
     border-left: 4px solid #667eea;
@@ -633,6 +633,7 @@ main {
     color: #4a5568;
     font-style: italic;
     line-height: 1.4;
+    margin-bottom: 16px;
 }
 
 @media (prefers-color-scheme: dark) {
