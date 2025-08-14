@@ -1386,6 +1386,7 @@ function getCategoryIcon(key, level) {
         oneSyllable: getMouthSVG(1),
         twoSyllable: getMouthSVG(2),
         threeSyllable: getMouthSVG(3),
+        usStates: '🗺️',
         alphaSprint: '⏱️',
         constitution: '📜',
         constitutionPreamble: '📋'

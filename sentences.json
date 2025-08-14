@@ -266,9 +266,26 @@
       "positive","negative","delicate","umbrella","medicine","lemonade","strawberry","october","elephant","butterfly"
     ]
   },
-    "realEnglish": {
-      "level": 10,
-      "name": "실제 영어 문장 연습",
+  "usStates": {
+    "level": 10,
+    "name": "미국 주 이름 연습",
+    "description": "미국 50개 주의 이름을 타이핑하여 연습합니다",
+    "sentences": [
+      "Alabama", "Alaska", "Arizona", "Arkansas", "California",
+      "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+      "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
+      "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",
+      "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri",
+      "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
+      "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",
+      "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
+      "South Dakota", "Tennessee", "Texas", "Utah", "Vermont",
+      "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
+    ]
+  },
+  "realEnglish": {
+    "level": 11,
+    "name": "실제 영어 문장 연습",
     "description": "실제 상황에서 사용되는 영어 문장들",
     "sentences": [
       "Camels use the fat for energy.",
@@ -334,7 +351,7 @@
     ]
   },
   "alnumPractice": {
-    "level": 11,
+    "level": 12,
     "name": "숫자+영문 혼합 연습",
     "description": "숫자와 영문이 섞인 문장을 타이핑합니다",
     "sentences": [
@@ -376,7 +393,7 @@
     ]
   },
   "movieQuiz": {
-    "level": 12,
+    "level": 13,
     "name": "영화 줄거리로 제목 맞추기",
     "description": "짧은 줄거리를 타이핑하고, 완료 시 객관식 보기를 선택해 제목을 맞춰보세요",
     "sentences": [
@@ -513,13 +530,13 @@
     ]
   },
   "alphaSprint": {
-    "level": 13,
+    "level": 14,
     "name": "Alpha Sprint (60초 / 100자)",
     "description": "60초 안에 100개의 랜덤 알파벳을 정확히 타이핑하세요",
     "sentences": [""]
   },
   "constitution": {
-    "level": 14,
+    "level": 15,
     "name": "대한민국 헌법 연습",
     "description": "대한민국 헌법의 주요 조항들을 타이핑하여 연습합니다",
     "sentences": [
@@ -544,7 +561,7 @@
     ]
   },
   "constitutionPreamble": {
-    "level": 15,
+    "level": 16,
     "name": "대한민국 헌법 전문 연습",
     "description": "대한민국 헌법 전문을 긴 문단으로 타이핑 연습합니다",
     "sentences": [
