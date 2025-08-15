@@ -1820,6 +1820,9 @@ function showBookSection() {
         sentenceDisplay: null
     });
     
+    // 한글 번역 표시 (korWords가 있는 경우)
+    displayKoreanTranslation(book, currentBookSection);
+    
     // 입력 필드 초기화
     bookTypingInput.value = '';
     bookTypingInput.focus();
@@ -1895,6 +1898,28 @@ function handleTypingInput(inputElement, targetText, onComplete) {
     }
 }
 
+function displayKoreanTranslation(book, sectionIndex) {
+    // 기존 한글 번역 요소 제거
+    const existingTranslation = document.getElementById('bookKoreanTranslation');
+    if (existingTranslation) {
+        existingTranslation.remove();
+    }
+    
+    // korWords가 있고 해당 인덱스의 번역이 있는 경우에만 표시
+    if (book.korWords && book.korWords[sectionIndex]) {
+        const bookTextDisplay = document.getElementById('bookTextDisplay');
+        if (bookTextDisplay) {
+            const translationDiv = document.createElement('div');
+            translationDiv.id = 'bookKoreanTranslation';
+            translationDiv.className = 'korean-translation';
+            translationDiv.textContent = book.korWords[sectionIndex];
+            
+            // bookTextDisplay 다음에 삽입
+            bookTextDisplay.parentNode.insertBefore(translationDiv, bookTextDisplay.nextSibling);
+        }
+    }
+}
+
 function checkBookTypingProgress() {
     const bookTypingInput = document.getElementById('bookTypingInput');
     const bookTextDisplay = document.getElementById('bookTextDisplay');
@@ -1913,6 +1938,9 @@ function checkBookTypingProgress() {
             sentenceCategories: null,
             sentenceDisplay: null
         });
+        
+        // 한글 번역 표시 (korWords가 있는 경우)
+        displayKoreanTranslation(book, currentBookSection);
     }
     
     // 공통 타이핑 로직 적용
@@ -1930,6 +1958,12 @@ function checkBookTypingProgress() {
 function showBookCompletion() {
     const bookTextDisplay = document.getElementById('bookTextDisplay');
     const bookTypingInput = document.getElementById('bookTypingInput');
+    
+    // 한글 번역 요소 제거
+    const existingTranslation = document.getElementById('bookKoreanTranslation');
+    if (existingTranslation) {
+        existingTranslation.remove();
+    }
     
     bookTextDisplay.innerHTML = `
         <h3>🎉 축하합니다!</h3>
