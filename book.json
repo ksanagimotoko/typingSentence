@@ -1,5 +1,7 @@
 {
     "littlePrince": {
+        "color": "linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%)",
+        "colorDark": "linear-gradient(135deg, #fdcb6e 0%, #e17055 100%)",
         "words": [
             "a pilot who crashed in the desert and met the prince",
             "a young prince who traveled from planet to planet",
@@ -64,6 +66,8 @@
         ]
     },
     "animalFarm": {
+            "color": "linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%)",
+            "colorDark": "linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)",
             "words": [
                 "an old boar named Old Major who inspires the animals to rebel",
                 "a pair of pigs, Snowball and Napoleon, who lead the revolution",

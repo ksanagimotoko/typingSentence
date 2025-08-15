@@ -455,6 +455,7 @@ function backToMenu() {
     bookTypingArea.style.display = 'none';
     resetTyping();
     resetDefaultTheme();
+    resetBookTheme(); // 책 테마도 초기화
     // 컨테이너 폭 초기화
     const container = document.querySelector('.container');
     if (container) container.style.maxWidth = '';
@@ -1744,6 +1745,9 @@ function showBookList() {
     bookList.style.display = 'grid';
     bookContent.style.display = 'none';
     
+    // 책 테마 초기화
+    resetBookTheme();
+    
     console.log('Book list display updated to grid');
     
     // 책 목록 렌더링
@@ -1794,6 +1798,9 @@ function selectBook(bookKey) {
     bookContent.style.display = 'block';
     
     bookTitle.textContent = getBookTitle(bookKey);
+    
+    // 책 테마 적용
+    applyBookTheme(bookKey);
     
     showBookSection();
 }
@@ -1895,6 +1902,36 @@ function handleTypingInput(inputElement, targetText, onComplete) {
         }
     } else {
         inputElement.classList.remove('correct', 'incorrect');
+    }
+}
+
+function applyBookTheme(bookKey) {
+    if (!bookData[bookKey]) return;
+    
+    const book = bookData[bookKey];
+    if (!defaultBodyBackground) {
+        defaultBodyBackground = document.body.style.background || '';
+    }
+    
+    // 부드러운 전환 적용
+    document.body.style.transition = 'background 300ms ease';
+    
+    // 다크 모드 확인
+    const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // 배경색 적용
+    if (isDarkMode && book.colorDark) {
+        document.body.style.background = book.colorDark;
+    } else if (book.color) {
+        document.body.style.background = book.color;
+    }
+}
+
+function resetBookTheme() {
+    if (defaultBodyBackground) {
+        document.body.style.background = defaultBodyBackground;
+    } else {
+        document.body.style.background = '';
     }
 }
 
@@ -2017,6 +2054,9 @@ function backToTyping() {
     categoryMenu.style.display = 'grid';
     typingArea.style.display = 'block';
     bookTypingArea.style.display = 'none';
+    
+    // 책 테마 초기화
+    resetBookTheme();
     
     updateNavigationState('typing');
 } 
