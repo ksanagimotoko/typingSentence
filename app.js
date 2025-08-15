@@ -1823,16 +1823,24 @@ function showBookTyping() {
     const categoryMenu = document.getElementById('categoryMenu');
     const typingArea = document.getElementById('typingArea');
     const bookTypingArea = document.getElementById('bookTypingArea');
+    const container = document.querySelector('.container');
     
     console.log('Elements found:', {
         categoryMenu: categoryMenu,
         typingArea: typingArea,
-        bookTypingArea: bookTypingArea
+        bookTypingArea: bookTypingArea,
+        container: container
     });
     
-    categoryMenu.style.display = 'none';
-    typingArea.style.display = 'none';
-    typingArea.classList.remove('active');
+    // 모든 타이핑 관련 영역을 강제로 숨김
+    if (categoryMenu) categoryMenu.style.display = 'none';
+    if (typingArea) {
+        typingArea.style.display = 'none';
+        typingArea.classList.remove('active');
+    }
+    if (container) container.style.display = 'none';
+    
+    // 책 타이핑 영역만 표시
     bookTypingArea.style.display = 'block';
     
     console.log('Display states updated');
