@@ -1378,6 +1378,7 @@ function getCategoryIcon(key, level) {
     }
     const map = {
         middleRowLetters: '⌨️',
+        keyboardPatterns: '🔤',
         middleRow: '🟪',
         topRow: '🟥',
         bottomRow: '🟩',

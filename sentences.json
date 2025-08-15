@@ -1,4 +1,30 @@
 {
+  "middleRowLetters": {
+    "level": 1,
+    "name": "중간 행 알파벳 연습",
+    "description": "중간 행의 각 알파벳을 하나씩 타이핑합니다",
+    "sentences": [
+      "a", "s", "d", "f", "g", "h", "j", "k", "l",
+      "l", "k", "j", "h", "g", "f", "d", "s", "a",
+      "a", "s", "d", "f", "j", "k", "l", "h", "g",
+      "g", "h", "j", "k", "l", "k", "j", "h", "g",
+      "a", "d", "f", "s", "j", "k", "l", "a", "s", "d", "f", "j", "k", "l"
+    ]
+  },
+  "keyboardPatterns": {
+    "level": 1.5,
+    "name": "키보드 패턴 연습",
+    "description": "반복되는 키보드 패턴을 타이핑하여 속도를 향상시킵니다",
+    "sentences": [
+      "fff ddd sss aaa aaa sss ddd fff ggg hhh jjj kkk lll",
+      "ggg hhh gh gg hh gh gh hg hg hg hg hh jj kk ll",
+      "gg ff dd ss aa asdf gh jkl jkl hjkl hjkl hjkl hjkl hjkl",
+      "qqq ppp www ooo eee iii rrr yyy ttt",
+      "aq sw de fr gt hy ju ki lo ;p",
+      "azz sxx dcc fvv gvv hbb jnn jmm k,,, l.. ;///",
+      "aqz swx dec frv gtv hyb jun jum ki, lo. ;p/"
+    ]
+  },
   "middleRow": {
     "level": 2,
     "name": "중간 행 키보드 연습",
@@ -56,18 +82,7 @@
       "Dad had gala with lads."
     ]
   },
-  "middleRowLetters": {
-    "level": 1,
-    "name": "중간 행 알파벳 연습",
-    "description": "중간 행의 각 알파벳을 하나씩 타이핑합니다",
-    "sentences": [
-      "a", "s", "d", "f", "g", "h", "j", "k", "l",
-      "l", "k", "j", "h", "g", "f", "d", "s", "a",
-      "a", "s", "d", "f", "j", "k", "l", "h", "g",
-      "g", "h", "j", "k", "l", "k", "j", "h", "g",
-      "a", "d", "f", "s", "j", "k", "l", "a", "s", "d", "f", "j", "k", "l"
-    ]
-  },
+ 
   "topRow": {
     "level": 3,
     "name": "상단 행 키보드 연습",
@@ -352,7 +367,7 @@
   },
   "mathSentences": {
     "level": 12,
-    "name": "수학 문장 연습",
+    "name": "더하기 빼기 곱하기 나누기 문장 연습",
     "description": "기본 수학 연산과 개념을 포함한 문장을 타이핑합니다",
     "sentences": [
       "2 plus 2 equals 4.",
