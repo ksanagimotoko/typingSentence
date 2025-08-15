@@ -762,8 +762,10 @@ function ensureQuizPanel() {
     return panel;
 }
 
-function renderSentenceHighlight(target, input) {
-    if (!sentenceDisplay) return;
+function renderSentenceHighlight(target, input, displayElement = null) {
+    const targetDisplay = displayElement || sentenceDisplay;
+    if (!targetDisplay) return;
+    
     const escape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const max = Math.min(target.length, input.length);
     let idx = 0;
@@ -774,11 +776,11 @@ function renderSentenceHighlight(target, input) {
     correct = correct.replace(/ /g, '&nbsp;');
     rest = rest.replace(/ /g, '&nbsp;');
     
-    // sentenceDisplay에는 영어 문장만 표시
-    sentenceDisplay.innerHTML = `<span class="typed-correct">${correct}</span>${rest}`;
+    // 지정된 디스플레이 요소에 문장 표시
+    targetDisplay.innerHTML = `<span class="typed-correct">${correct}</span>${rest}`;
     
-    // 헌법 관련 카테고리일 때 한글 번역을 sentenceDisplay 아래에 별도로 표시
-    if ((currentCategory === 'constitution' || currentCategory === 'constitutionPreamble') && sentenceCategories[currentCategory].koreanTranslations) {
+    // 헌법 관련 카테고리일 때 한글 번역을 sentenceDisplay 아래에 별도로 표시 (기본 sentenceDisplay에만 적용)
+    if (!displayElement && (currentCategory === 'constitution' || currentCategory === 'constitutionPreamble') && sentenceCategories[currentCategory].koreanTranslations) {
         const koreanText = sentenceCategories[currentCategory].koreanTranslations[currentSentenceIndex];
         if (koreanText) {
             // 기존 한글 번역 요소가 있으면 제거
@@ -796,7 +798,7 @@ function renderSentenceHighlight(target, input) {
             // sentenceDisplay 다음에 삽입
             sentenceDisplay.parentNode.insertBefore(translationDiv, sentenceDisplay.nextSibling);
         }
-    } else {
+    } else if (!displayElement) {
         // 헌법 관련 카테고리가 아닐 때는 한글 번역 요소 제거
         const existingTranslation = document.getElementById('koreanTranslation');
         if (existingTranslation) {
@@ -1277,77 +1279,28 @@ typingInput.addEventListener('input', (e) => {
     // 문장 하이라이트 갱신
     renderSentenceHighlight(target, input);
 
-    // 키 입력마다 프레임 업데이트 (요청 사항)
-    updateAsciiRunner(false);
-
-    if (input.length > 0) {
-        const accuracy = checkAccuracy(input, target);
-       // accuracyIndicator.textContent = `정확도: ${accuracy.percentage}%`;
-
-        // 오타 추적
-        if (input.length > 0 && !target.startsWith(input)) {
-            const currentWord = input.split(' ').pop();
-            const targetWord = target.split(' ')[input.split(' ').length - 1];
-            if (currentWord && targetWord && currentWord !== targetWord) {
-                const error = {
-                    word: targetWord,
-                    typed: currentWord,
-                    timestamp: Date.now()
-                };
-                if (!sessionErrors.find(e => e.word === targetWord && e.typed === currentWord)) {
-                    sessionErrors.push(error);
-                }
-            }
-            // 오타 시 흔들림 + 경고음
-            shakeAsciiRunner();
-            playErrorBeep();
-            showEncourage('error');
+    // 공통 타이핑 로직 사용 (단, 통계 업데이트와 영화 퀴즈 처리 추가)
+    handleTypingInput(e.target, target, () => {
+        // 통계는 타이핑 세션이 시작된 상태일 때만 집계
+        if (isTyping) {
+            correctWords += target.split(/\s+/).length;
+            totalWords += target.split(/\s+/).length;
+            updateStats();
         }
 
-        if (input === target) {
-            e.target.classList.add('correct');
-            e.target.classList.remove('incorrect');
+        // 영화 퀴즈일 경우 제목 노출
+        revealMovieTitleAtIndex(currentSentenceIndex);
+        // 그리고 객관식 보기 표시
+        showMovieChoicesAtIndex(currentSentenceIndex);
 
-            // 통계는 타이핑 세션이 시작된 상태일 때만 집계
-            if (isTyping) {
-                correctWords += target.split(/\s+/).length;
-                totalWords += target.split(/\s+/).length;
-                updateStats();
-            }
-
-            // 문장 완성 성공음
-            playSuccessTone();
-            showEncourage('success');
-            // 영화 퀴즈일 경우 제목 노출
-            revealMovieTitleAtIndex(currentSentenceIndex);
-            // 그리고 객관식 보기 표시
-            showMovieChoicesAtIndex(currentSentenceIndex);
-
-            setTimeout(() => {
-                if (currentCategory === 'movieQuiz') {
-                    return; // 영화 퀴즈는 버튼으로 계속/종료를 결정
-                }
-                nextSentence();
-            }, 0);
-        } else if (target.startsWith(input)) {
-            e.target.classList.remove('incorrect');
-            e.target.classList.remove('correct');
-            // 부분 정답 진행 카운트만 업데이트
-            if (input.length > asciiLastCorrectCharCount) {
-                asciiLastCorrectCharCount = input.length;
-                // 올바르게 한 글자 진행될 때 부드러운 성공음
-                playSuccessTone();
-                showEncourage('partial');
-            }
-        } else {
-            e.target.classList.add('incorrect');
-            e.target.classList.remove('correct');
-            // 오답 추가 입력 시도에도 흔들림만
-            shakeAsciiRunner();
-            showEncourage('error');
+        if (currentCategory === 'movieQuiz') {
+            return; // 영화 퀴즈는 버튼으로 계속/종료를 결정
         }
-    } else {
-        e.target.classList.remove('correct', 'incorrect');
+        nextSentence();
+    });
+
+    // 입력이 비어있을 때 정확도 표시 초기화
+    if (input.length === 0) {
         accuracyIndicator.textContent = '';
     }
 });
@@ -1915,15 +1868,80 @@ function showBookSection() {
     bookTypingInput.value = '';
     bookTypingInput.focus();
     
-    // 타이핑 이벤트 리스너 추가
-    bookTypingInput.oninput = () => {
-        checkBookTypingProgress();
-    };
+    // ASCII 애니메이션 초기화
+    asciiLastCorrectCharCount = 0;
+    applyAsciiAnimalForCurrent();
+    
+    // 기존 이벤트 리스너 제거 후 새로 추가
+    bookTypingInput.removeEventListener('input', checkBookTypingProgress);
+    bookTypingInput.addEventListener('input', checkBookTypingProgress);
+}
+
+// 공통 타이핑 로직 함수
+function handleTypingInput(inputElement, targetText, onComplete) {
+    const input = inputElement.value;
+    
+    // ASCII 애니메이션 업데이트
+    updateAsciiRunner(false);
+    
+    if (input.length > 0) {
+        const accuracy = checkAccuracy(input, targetText);
+        
+        // 오타 추적
+        if (input.length > 0 && !targetText.startsWith(input)) {
+            const currentWord = input.split(' ').pop();
+            const targetWord = targetText.split(' ')[input.split(' ').length - 1];
+            if (currentWord && targetWord && currentWord !== targetWord) {
+                const error = {
+                    word: targetWord,
+                    typed: currentWord,
+                    timestamp: Date.now()
+                };
+                if (!sessionErrors.find(e => e.word === targetWord && e.typed === currentWord)) {
+                    sessionErrors.push(error);
+                }
+            }
+            // 오타 시 흔들림 + 경고음
+            shakeAsciiRunner();
+            playErrorBeep();
+            showEncourage('error');
+        }
+        
+        if (input === targetText) {
+            inputElement.classList.add('correct');
+            inputElement.classList.remove('incorrect');
+            
+            // 문장 완성 성공음
+            playSuccessTone();
+            showEncourage('success');
+            
+            setTimeout(() => {
+                if (onComplete) onComplete();
+            }, 0);
+        } else if (targetText.startsWith(input)) {
+            inputElement.classList.remove('incorrect');
+            inputElement.classList.remove('correct');
+            // 올바르게 한 글자 진행될 때 부드러운 성공음
+            if (input.length > asciiLastCorrectCharCount) {
+                asciiLastCorrectCharCount = input.length;
+                playSuccessTone();
+                showEncourage('partial');
+            }
+        } else {
+            inputElement.classList.add('incorrect');
+            inputElement.classList.remove('correct');
+            // 오답 추가 입력 시도에도 흔들림만
+            shakeAsciiRunner();
+            showEncourage('error');
+        }
+    } else {
+        inputElement.classList.remove('correct', 'incorrect');
+    }
 }
 
 function checkBookTypingProgress() {
     const bookTypingInput = document.getElementById('bookTypingInput');
-    const inputText = bookTypingInput.value.trim();
+    const bookTextDisplay = document.getElementById('bookTextDisplay');
     
     if (!currentBook || !bookData[currentBook]) return;
     
@@ -1931,18 +1949,21 @@ function checkBookTypingProgress() {
     const sections = book.words || book.synonyms || [];
     const currentSection = sections[currentBookSection];
     
-    if (inputText === currentSection) {
-        // 현재 섹션 완료
-        setTimeout(() => {
-            currentBookSection++;
-            if (currentBookSection >= sections.length) {
-                // 모든 섹션 완료
-                showBookCompletion();
-            } else {
-                showBookSection();
-            }
-        }, 500);
+    // 텍스트 하이라이트 업데이트 (bookTextDisplay에 적용)
+    if (bookTextDisplay) {
+        renderSentenceHighlight(currentSection, bookTypingInput.value, bookTextDisplay);
     }
+    
+    // 공통 타이핑 로직 적용
+    handleTypingInput(bookTypingInput, currentSection, () => {
+        // 완료 시 다음 섹션으로 이동
+        currentBookSection++;
+        if (currentBookSection >= sections.length) {
+            showBookCompletion();
+        } else {
+            showBookSection();
+        }
+    });
 }
 
 function showBookCompletion() {
