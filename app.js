@@ -1812,7 +1812,13 @@ function showBookSection() {
     }
     
     const sectionText = sections[currentBookSection];
-    bookTextDisplay.textContent = sectionText;
+    // 초기 렌더링 시에도 renderSentenceHighlight 사용 (입력은 빈 문자열)
+    renderSentenceHighlight(sectionText, '', bookTextDisplay, {
+        currentCategory: null, // 책 타이핑은 별도 카테고리가 없음
+        currentSentenceIndex: currentBookSection,
+        sentenceCategories: null,
+        sentenceDisplay: null
+    });
     
     // 입력 필드 초기화
     bookTypingInput.value = '';
@@ -1903,7 +1909,7 @@ function checkBookTypingProgress() {
     if (bookTextDisplay) {
         renderSentenceHighlight(currentSection, bookTypingInput.value, bookTextDisplay, {
             currentCategory: null, // 책 타이핑은 별도 카테고리가 없음
-            currentSentenceIndex: 0,
+            currentSentenceIndex: currentBookSection,
             sentenceCategories: null,
             sentenceDisplay: null
         });
