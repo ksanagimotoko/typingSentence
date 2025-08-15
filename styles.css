@@ -735,11 +735,14 @@ main {
     background: #f8f9fa;
     border: 2px solid #e9ecef;
     border-radius: 12px;
-    padding: 1.5rem;
-    min-height: 200px;
+    padding: 1rem;
+    min-height: 3rem;
+    height: auto;
     line-height: 1.6;
     color: #2d3748;
     font-size: 1rem;
+    display: flex;
+    align-items: center;
 }
 
 .book-input-area {
@@ -750,18 +753,26 @@ main {
 
 .book-typing-input {
     width: 100%;
-    min-height: 150px;
-    padding: 1rem;
+    height: 3rem;
+    padding: 0 1rem;
     border: 2px solid #e9ecef;
     border-radius: 8px;
     font-size: 1rem;
     line-height: 1.6;
-    resize: vertical;
     font-family: inherit;
+    outline: none;
+    transition: all 0.3s ease;
 }
 
 .book-typing-input:focus {
-    outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.book-typing-input.correct {
+    border-color: #28a745;
+}
+
+.book-typing-input.incorrect {
+    border-color: #dc3545;
 } 
