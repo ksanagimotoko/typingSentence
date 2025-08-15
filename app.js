@@ -444,14 +444,19 @@ function getDifficulty(sentences) {
 function backToMenu() {
     const categoryMenu = document.getElementById('categoryMenu');
     const typingArea = document.getElementById('typingArea');
+    const bookTypingArea = document.getElementById('bookTypingArea');
 
     categoryMenu.style.display = 'grid';
+    typingArea.style.display = 'block';
     typingArea.classList.remove('active');
+    bookTypingArea.style.display = 'none';
     resetTyping();
     resetDefaultTheme();
     // 컨테이너 폭 초기화
     const container = document.querySelector('.container');
     if (container) container.style.maxWidth = '';
+    
+    updateNavigationState('typing');
 }
 
 function showToast(message, durationMs = 1500) {
@@ -1408,7 +1413,10 @@ async function bootstrap() {
 }
 
 // 초기화
-document.addEventListener('DOMContentLoaded', () => { bootstrap().then(() => setTimeout(() => focusTypingInput(), 0)); }); 
+document.addEventListener('DOMContentLoaded', () => { 
+    bootstrap().then(() => setTimeout(() => focusTypingInput(), 0));
+    initializeBookTyping();
+}); 
 
 function getCategoryIcon(key, level) {
     if (key === 'realEnglish') {
@@ -1763,4 +1771,251 @@ function getCertificationBadgeSVG() {
   <!-- Check mark -->
   <path d="M24 28 l6 6 14-14" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
 </svg>`;
+}
+
+// 책 타이핑 관련 함수들
+let bookData = {};
+let currentBook = null;
+let currentBookSection = 0;
+
+async function loadBookData() {
+    try {
+        const response = await fetch('book.json');
+        if (!response.ok) throw new Error('Failed to load book.json');
+        bookData = await response.json();
+        console.log('Book data loaded:', bookData);
+    } catch (error) {
+        console.error('Error loading book data:', error);
+        bookData = {};
+    }
+}
+
+function initializeBookTyping() {
+    console.log('initializeBookTyping called');
+    loadBookData();
+    
+    // 책 타이핑 메뉴 클릭 이벤트
+    const bookTypingMenu = document.getElementById('bookTypingMenu');
+    console.log('bookTypingMenu element:', bookTypingMenu);
+    
+    if (bookTypingMenu) {
+        bookTypingMenu.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Book typing menu clicked');
+            showBookTyping();
+        });
+    } else {
+        console.error('bookTypingMenu element not found');
+    }
+    
+    // 뒤로가기 버튼 이벤트
+    const backToBookList = document.getElementById('backToBookList');
+    if (backToBookList) {
+        backToBookList.addEventListener('click', () => {
+            showBookList();
+        });
+    }
+}
+
+function showBookTyping() {
+    console.log('showBookTyping called');
+    
+    const categoryMenu = document.getElementById('categoryMenu');
+    const typingArea = document.getElementById('typingArea');
+    const bookTypingArea = document.getElementById('bookTypingArea');
+    
+    console.log('Elements found:', {
+        categoryMenu: categoryMenu,
+        typingArea: typingArea,
+        bookTypingArea: bookTypingArea
+    });
+    
+    categoryMenu.style.display = 'none';
+    typingArea.style.display = 'none';
+    typingArea.classList.remove('active');
+    bookTypingArea.style.display = 'block';
+    
+    console.log('Display states updated');
+    showBookList();
+    
+    // 네비게이션 메뉴 활성화 상태 변경
+    updateNavigationState('bookTyping');
+}
+
+function showBookList() {
+    console.log('showBookList called');
+    
+    const bookList = document.getElementById('bookList');
+    const bookContent = document.getElementById('bookContent');
+    
+    console.log('Book list elements:', {
+        bookList: bookList,
+        bookContent: bookContent
+    });
+    
+    bookList.style.display = 'grid';
+    bookContent.style.display = 'none';
+    
+    console.log('Book list display updated to grid');
+    
+    // 책 목록 렌더링
+    renderBookList();
+}
+
+function renderBookList() {
+    const bookList = document.getElementById('bookList');
+    if (!bookList) return;
+    
+    console.log('Rendering book list, bookData:', bookData);
+    console.log('Book list element:', bookList);
+    
+    bookList.innerHTML = '';
+    
+    Object.keys(bookData).forEach(bookKey => {
+        const book = bookData[bookKey];
+        const bookCard = document.createElement('div');
+        bookCard.className = 'book-card';
+        
+        const bookTitle = getBookTitle(bookKey);
+        const bookDescription = getBookDescription(bookKey);
+        
+        bookCard.innerHTML = `
+            <h3>${bookTitle}</h3>
+            <p>${bookDescription}</p>
+        `;
+        
+        bookCard.addEventListener('click', () => {
+            selectBook(bookKey);
+        });
+        
+        bookList.appendChild(bookCard);
+        console.log('Added book card for:', bookKey, 'Card element:', bookCard);
+        console.log('Book list children count:', bookList.children.length);
+    });
+}
+
+function selectBook(bookKey) {
+    currentBook = bookKey;
+    currentBookSection = 0;
+    
+    const bookList = document.getElementById('bookList');
+    const bookContent = document.getElementById('bookContent');
+    const bookTitle = document.getElementById('bookTitle');
+    
+    bookList.style.display = 'none';
+    bookContent.style.display = 'block';
+    
+    bookTitle.textContent = getBookTitle(bookKey);
+    
+    showBookSection();
+}
+
+function showBookSection() {
+    const bookTextDisplay = document.getElementById('bookTextDisplay');
+    const bookTypingInput = document.getElementById('bookTypingInput');
+    
+    if (!currentBook || !bookData[currentBook]) return;
+    
+    const book = bookData[currentBook];
+    const sections = book.words || book.synonyms || [];
+    
+    if (currentBookSection >= sections.length) {
+        currentBookSection = 0;
+    }
+    
+    const sectionText = sections[currentBookSection];
+    bookTextDisplay.textContent = sectionText;
+    
+    // 입력 필드 초기화
+    bookTypingInput.value = '';
+    bookTypingInput.focus();
+    
+    // 타이핑 이벤트 리스너 추가
+    bookTypingInput.oninput = () => {
+        checkBookTypingProgress();
+    };
+}
+
+function checkBookTypingProgress() {
+    const bookTypingInput = document.getElementById('bookTypingInput');
+    const inputText = bookTypingInput.value.trim();
+    
+    if (!currentBook || !bookData[currentBook]) return;
+    
+    const book = bookData[currentBook];
+    const sections = book.words || book.synonyms || [];
+    const currentSection = sections[currentBookSection];
+    
+    if (inputText === currentSection) {
+        // 현재 섹션 완료
+        setTimeout(() => {
+            currentBookSection++;
+            if (currentBookSection >= sections.length) {
+                // 모든 섹션 완료
+                showBookCompletion();
+            } else {
+                showBookSection();
+            }
+        }, 500);
+    }
+}
+
+function showBookCompletion() {
+    const bookTextDisplay = document.getElementById('bookTextDisplay');
+    const bookTypingInput = document.getElementById('bookTypingInput');
+    
+    bookTextDisplay.innerHTML = `
+        <h3>🎉 축하합니다!</h3>
+        <p>${getBookTitle(currentBook)}의 모든 내용을 타이핑했습니다!</p>
+        <button onclick="showBookList()" class="btn btn-primary">다른 책 선택하기</button>
+    `;
+    
+    bookTypingInput.style.display = 'none';
+}
+
+function getBookTitle(bookKey) {
+    const titles = {
+        'littlePrince': '어린 왕자',
+        'animalFarm': '동물 농장'
+    };
+    return titles[bookKey] || bookKey;
+}
+
+function getBookDescription(bookKey) {
+    const descriptions = {
+        'littlePrince': '생텍쥐페리의 명작. 어린 왕자의 우주 여행과 사랑에 대한 깊이 있는 이야기',
+        'animalFarm': '조지 오웰의 우화. 동물들이 인간을 몰아내고 이상적인 사회를 건설하려는 이야기'
+    };
+    return descriptions[bookKey] || '영어 문학 작품을 타이핑하여 연습합니다';
+}
+
+function updateNavigationState(activeSection) {
+    const navLinks = document.querySelectorAll('.nav-links a');
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    if (activeSection === 'bookTyping') {
+        const bookTypingMenu = document.getElementById('bookTypingMenu');
+        if (bookTypingMenu) {
+            bookTypingMenu.classList.add('active');
+        }
+    } else if (activeSection === 'typing') {
+        const typingMenu = document.querySelector('.nav-links a[href="/"]');
+        if (typingMenu) {
+            typingMenu.classList.add('active');
+        }
+    }
+}
+
+function backToTyping() {
+    const categoryMenu = document.getElementById('categoryMenu');
+    const typingArea = document.getElementById('typingArea');
+    const bookTypingArea = document.getElementById('bookTypingArea');
+    
+    categoryMenu.style.display = 'grid';
+    typingArea.style.display = 'block';
+    bookTypingArea.style.display = 'none';
+    
+    updateNavigationState('typing');
 } 

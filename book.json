@@ -42,5 +42,49 @@
             "The pilot repairs his plane and never forgets the prince.",
             "He looks at the stars and hears the prince's laughter in his heart."
         ]
+    },
+    "animalFarm": {
+            "words": [
+                "an old boar named Old Major who inspires the animals to rebel",
+                "a pair of pigs, Snowball and Napoleon, who lead the revolution",
+                "a pig named Squealer who spreads propaganda",
+                "a hard-working cart-horse named Boxer",
+                "a gentle mare named Clover who cares for the others",
+                "a cynical donkey named Benjamin",
+                "a vain mare named Mollie who loves sugar and ribbons",
+                "a flock of sheep that follow slogans without thinking",
+                "a pack of dogs trained to protect Napoleon",
+                "a crow named Moses who talks about Sugarcandy Mountain",
+                "the farmhouse where the humans once lived",
+                "the windmill that becomes the central project of the farm",
+                "the Seven Commandments of Animalism",
+                "the humans who once owned and oppressed the animals",
+                "Mr. Jones, the negligent owner of the farm",
+                "a battle known as the Battle of the Cowshed",
+                "a battle known as the Battle of the Windmill",
+                "the farm renamed Animal Farm after the rebellion",
+                "the farm renamed back to Manor Farm at the end"
+            ],
+            "synonyms": [
+                "Old Major, an old boar, gathers the animals and inspires them to rebel against humans.",
+                "He teaches them the principles of Animalism and warns against human oppression.",
+                "After Old Major dies, the pigs Snowball and Napoleon take leadership.",
+                "The animals overthrow Mr. Jones and rename the farm Animal Farm.",
+                "They establish the Seven Commandments as their guiding laws.",
+                "Snowball plans to build a windmill to improve the farm.",
+                "Napoleon uses trained dogs to drive Snowball away and seizes power.",
+                "Squealer spreads propaganda to justify Napoleon's actions.",
+                "The animals work hard to build the windmill.",
+                "Boxer, the strong cart-horse, works tirelessly with the motto 'I will work harder.'",
+                "The Battle of the Cowshed defends the farm from human attack.",
+                "The windmill is destroyed and rebuilt multiple times.",
+                "The animals face hunger and hardship, but propaganda keeps them loyal.",
+                "Boxer collapses from exhaustion and is secretly sold to the knacker.",
+                "The pigs begin to walk on two legs and live like humans.",
+                "The Seven Commandments are altered to favor the pigs.",
+                "The pigs make deals with humans and abandon the principles of Animalism.",
+                "The farm is renamed back to Manor Farm.",
+                "The animals realize they can no longer tell the pigs from the humans."
+            ]
+        }
     }
-}
