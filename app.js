@@ -419,6 +419,7 @@ function initializeCategoryMenu() {
             typingArea.classList.add('active');
             updateDisplay();
             updateLevelBadge();
+            applyCategoryTheme();
             // 입력 칸 포커스 보장
             setTimeout(() => focusTypingInput(), 0);
         });
@@ -477,10 +478,24 @@ function updateLevelBadge() {
 
 const defaultThemeByLevel = {
     1: { gradient: 'linear-gradient(135deg, #e0f7ff 0%, #b3e5fc 100%)', gradientDark: 'linear-gradient(135deg, #0d47a1 0%, #1565c0 100%)' },
+    1.5: { gradient: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)', gradientDark: 'linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%)' },
+    1.8: { gradient: 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)', gradientDark: 'linear-gradient(135deg, #e65100 0%, #ef6c00 100%)' },
     2: { gradient: 'linear-gradient(135deg, #ede7f6 0%, #d1c4e9 100%)', gradientDark: 'linear-gradient(135deg, #4527a0 0%, #5e35b1 100%)' },
     3: { gradient: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)', gradientDark: 'linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%)' },
     4: { gradient: 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)', gradientDark: 'linear-gradient(135deg, #e65100 0%, #ef6c00 100%)' },
-    5: { gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', gradientDark: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)' }
+    5: { gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', gradientDark: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)' },
+    6: { gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)', gradientDark: 'linear-gradient(135deg, #880e4f 0%, #ad1457 100%)' },
+    7: { gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', gradientDark: 'linear-gradient(135deg, #00695c 0%, #004d40 100%)' },
+    8: { gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', gradientDark: 'linear-gradient(135deg, #bf360c 0%, #d84315 100%)' },
+    9: { gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)', gradientDark: 'linear-gradient(135deg, #880e4f 0%, #ad1457 100%)' },
+    10: { gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', gradientDark: 'linear-gradient(135deg, #00695c 0%, #004d40 100%)' },
+    11: { gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', gradientDark: 'linear-gradient(135deg, #bf360c 0%, #d84315 100%)' },
+    12: { gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', gradientDark: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)' },
+    13: { gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', gradientDark: 'linear-gradient(135deg, #4a148c 0%, #6a1b9a 100%)' },
+    14: { gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', gradientDark: 'linear-gradient(135deg, #0277bd 0%, #0288d1 100%)' },
+    15: { gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', gradientDark: 'linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%)' },
+    16: { gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', gradientDark: 'linear-gradient(135deg, #c2185b 0%, #d81b60 100%)' },
+    17: { gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', gradientDark: 'linear-gradient(135deg, #00695c 0%, #004d40 100%)' }
 };
 
 function applyCategoryTheme() {
@@ -494,9 +509,22 @@ function applyCategoryTheme() {
     // gradient 우선, 없으면 color
     const gradient = cat && (cat.gradient || (cat.level && defaultThemeByLevel[cat.level]?.gradient));
     const color = cat && cat.color;
+    
+    // 소수점 레벨 처리 (예: 1.5, 1.8)
+    let levelGradient = null;
+    if (cat && cat.level) {
+        levelGradient = defaultThemeByLevel[cat.level]?.gradient;
+        if (!levelGradient && typeof cat.level === 'number') {
+            // 소수점 레벨의 경우 가장 가까운 정수 레벨의 테마 사용
+            const roundedLevel = Math.round(cat.level);
+            levelGradient = defaultThemeByLevel[roundedLevel]?.gradient;
+        }
+    }
 
     if (gradient) {
         document.body.style.background = gradient;
+    } else if (levelGradient) {
+        document.body.style.background = levelGradient;
     } else if (color) {
         document.body.style.background = color;
     } else {
@@ -507,8 +535,21 @@ function applyCategoryTheme() {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         const gradientDark = cat && (cat.gradientDark || (cat.level && defaultThemeByLevel[cat.level]?.gradientDark));
         const colorDark = cat && cat.colorDark;
+        
+        // 소수점 레벨의 다크 모드 처리
+        let levelGradientDark = null;
+        if (cat && cat.level) {
+            levelGradientDark = defaultThemeByLevel[cat.level]?.gradientDark;
+            if (!levelGradientDark && typeof cat.level === 'number') {
+                const roundedLevel = Math.round(cat.level);
+                levelGradientDark = defaultThemeByLevel[roundedLevel]?.gradientDark;
+            }
+        }
+        
         if (gradientDark) {
             document.body.style.background = gradientDark;
+        } else if (levelGradientDark) {
+            document.body.style.background = levelGradientDark;
         } else if (colorDark) {
             document.body.style.background = colorDark;
         }
