@@ -1,5 +1,5 @@
-// 외부 모듈에서 playErrorBeep 함수 가져오기
-import { playErrorBeep } from './external_module.js';
+// 외부 모듈에서 오디오 함수들 가져오기
+import { playErrorBeep, playSuccessTone } from './external_module.js';
 
 let sentenceCategories = window.sentenceCategories || {
     middleRow: {
@@ -1029,34 +1029,7 @@ function saveSessionStats() {
 
 
 
-let successAudioContext = null;
-let lastSuccessAt = 0;
-function playSuccessTone() {
-    try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return;
-        if (!successAudioContext) successAudioContext = new AudioCtx();
-        // 스로틀: 30ms
-        const nowMs = Date.now();
-        if (nowMs - lastSuccessAt < 30) return;
-        lastSuccessAt = nowMs;
 
-        const duration = 0.09; // 90ms
-        const now = successAudioContext.currentTime;
-        const osc = successAudioContext.createOscillator();
-        const gain = successAudioContext.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(220, now); // 저음 A3 근처
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.15, now + 0.005);
-        gain.gain.linearRampToValueAtTime(0.0, now + duration);
-        osc.connect(gain).connect(successAudioContext.destination);
-        osc.start(now);
-        osc.stop(now + duration + 0.02);
-    } catch (_) {
-        // ignore
-    }
-}
 
 let movieChoicesActive = false;
 let movieShuffledCorrectIndex = {};
