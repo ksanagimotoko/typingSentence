@@ -1123,7 +1123,7 @@ function verifyMovieAnswer(index, selectedIdx) {
     const feed = document.createElement('div');
     feed.id = 'movieTitleReveal';
     const correctTitle = (cat.titles && cat.titles[index]) ? cat.titles[index] : '';
-    feed.textContent = isCorrect ? `정답입니다! → "${correctTitle}"` : `오답입니다! 정답은 "${correctTitle}"`;
+    feed.textContent = isCorrect ? `정답입니다!` : `오답입니다!`;
     feed.style.marginTop = '8px';
     feed.style.fontWeight = '700';
     feed.style.color = isCorrect ? '#065f46' : '#991b1b';
