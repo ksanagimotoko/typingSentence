@@ -1,5 +1,5 @@
-// 외부 모듈에서 오디오 함수들 가져오기
-import { playErrorBeep, playSuccessTone } from './external_module.js';
+// 외부 모듈에서 함수들 가져오기
+import { playErrorBeep, playSuccessTone, renderSentenceHighlight } from './external_module.js';
 
 let sentenceCategories = window.sentenceCategories || {
     middleRow: {
@@ -762,50 +762,7 @@ function ensureQuizPanel() {
     return panel;
 }
 
-function renderSentenceHighlight(target, input, displayElement = null) {
-    const targetDisplay = displayElement || sentenceDisplay;
-    if (!targetDisplay) return;
-    
-    const escape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const max = Math.min(target.length, input.length);
-    let idx = 0;
-    while (idx < max && target[idx] === input[idx]) idx++;
-    let correct = escape(target.slice(0, idx));
-    let rest = escape(target.slice(idx));
-    // 공백 보존: 일반 공백을 &nbsp;로 치환해 경계 공백 소실 방지
-    correct = correct.replace(/ /g, '&nbsp;');
-    rest = rest.replace(/ /g, '&nbsp;');
-    
-    // 지정된 디스플레이 요소에 문장 표시
-    targetDisplay.innerHTML = `<span class="typed-correct">${correct}</span>${rest}`;
-    
-    // 헌법 관련 카테고리일 때 한글 번역을 sentenceDisplay 아래에 별도로 표시 (기본 sentenceDisplay에만 적용)
-    if (!displayElement && (currentCategory === 'constitution' || currentCategory === 'constitutionPreamble') && sentenceCategories[currentCategory].koreanTranslations) {
-        const koreanText = sentenceCategories[currentCategory].koreanTranslations[currentSentenceIndex];
-        if (koreanText) {
-            // 기존 한글 번역 요소가 있으면 제거
-            const existingTranslation = document.getElementById('koreanTranslation');
-            if (existingTranslation) {
-                existingTranslation.remove();
-            }
-            
-            // 새로운 한글 번역 요소 생성 및 삽입
-            const translationDiv = document.createElement('div');
-            translationDiv.id = 'koreanTranslation';
-            translationDiv.className = 'korean-translation';
-            translationDiv.innerHTML = escape(koreanText);
-            
-            // sentenceDisplay 다음에 삽입
-            sentenceDisplay.parentNode.insertBefore(translationDiv, sentenceDisplay.nextSibling);
-        }
-    } else if (!displayElement) {
-        // 헌법 관련 카테고리가 아닐 때는 한글 번역 요소 제거
-        const existingTranslation = document.getElementById('koreanTranslation');
-        if (existingTranslation) {
-            existingTranslation.remove();
-        }
-    }
-}
+
 
 function clearMovieTitleReveal() {
     const existing = document.getElementById('movieTitleReveal');
@@ -838,7 +795,12 @@ function updateDisplay() {
     // Alpha Sprint 모드 특수 처리
     if (currentCategory === 'alphaSprint') {
         if (!alphaSprintActive) startAlphaSprint();
-        renderSentenceHighlight(alphaSprintTarget, typingInput ? typingInput.value : '');
+        renderSentenceHighlight(alphaSprintTarget, typingInput ? typingInput.value : '', null, {
+            currentCategory,
+            currentSentenceIndex,
+            sentenceCategories,
+            sentenceDisplay
+        });
         setContainerWidthForSentence(alphaSprintTarget);
         progressBar.style.width = `0%`;
         if (remainingInfo) {
@@ -853,7 +815,12 @@ function updateDisplay() {
 
     const currentSentences = sentenceCategories[currentCategory].sentences || sentenceCategories[currentCategory].paragraph || [];
     const targetText = currentSentences[currentSentenceIndex];
-    renderSentenceHighlight(targetText, typingInput ? typingInput.value : '');
+    renderSentenceHighlight(targetText, typingInput ? typingInput.value : '', null, {
+        currentCategory,
+        currentSentenceIndex,
+        sentenceCategories,
+        sentenceDisplay
+    });
     // 문장 길이에 따른 컨테이너 폭 조정
     setContainerWidthForSentence(targetText);
     // 영화 제목 노출 초기화
@@ -1238,7 +1205,12 @@ typingInput.addEventListener('input', (e) => {
         }
         alphaSprintPrevLen = input.length;
 
-        renderSentenceHighlight(alphaSprintTarget, input);
+        renderSentenceHighlight(alphaSprintTarget, input, null, {
+            currentCategory,
+            currentSentenceIndex,
+            sentenceCategories,
+            sentenceDisplay
+        });
         updateAsciiRunner(false);
         if (input.length >= getSprintTotal()) {
             finishAlphaSprint(true);
@@ -1250,7 +1222,12 @@ typingInput.addEventListener('input', (e) => {
     const target = sentenceCategories[currentCategory].sentences[currentSentenceIndex];
 
     // 문장 하이라이트 갱신
-    renderSentenceHighlight(target, input);
+    renderSentenceHighlight(target, input, null, {
+        currentCategory,
+        currentSentenceIndex,
+        sentenceCategories,
+        sentenceDisplay
+    });
 
     // 공통 타이핑 로직 사용 (단, 통계 업데이트와 영화 퀴즈 처리 추가)
     handleTypingInput(e.target, target, () => {
@@ -1924,7 +1901,12 @@ function checkBookTypingProgress() {
     
     // 텍스트 하이라이트 업데이트 (bookTextDisplay에 적용)
     if (bookTextDisplay) {
-        renderSentenceHighlight(currentSection, bookTypingInput.value, bookTextDisplay);
+        renderSentenceHighlight(currentSection, bookTypingInput.value, bookTextDisplay, {
+            currentCategory: null, // 책 타이핑은 별도 카테고리가 없음
+            currentSentenceIndex: 0,
+            sentenceCategories: null,
+            sentenceDisplay: null
+        });
     }
     
     // 공통 타이핑 로직 적용

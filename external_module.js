@@ -54,4 +54,58 @@ export function playSuccessTone() {
     } catch (_) {
         // ignore
     }
+}
+
+export function renderSentenceHighlight(target, input, displayElement = null, options = {}) {
+    const { 
+        currentCategory = null, 
+        currentSentenceIndex = 0,
+        sentenceCategories = null,
+        sentenceDisplay = null 
+    } = options;
+    
+    const targetDisplay = displayElement || sentenceDisplay;
+    if (!targetDisplay) return;
+    
+    const escape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const max = Math.min(target.length, input.length);
+    let idx = 0;
+    while (idx < max && target[idx] === input[idx]) idx++;
+    let correct = escape(target.slice(0, idx));
+    let rest = escape(target.slice(idx));
+    // 공백 보존: 일반 공백을 &nbsp;로 치환해 경계 공백 소실 방지
+    correct = correct.replace(/ /g, '&nbsp;');
+    rest = rest.replace(/ /g, '&nbsp;');
+    
+    // 지정된 디스플레이 요소에 문장 표시
+    targetDisplay.innerHTML = `<span class="typed-correct">${correct}</span>${rest}`;
+    
+    // 헌법 관련 카테고리일 때 한글 번역을 sentenceDisplay 아래에 별도로 표시 (기본 sentenceDisplay에만 적용)
+    if (!displayElement && currentCategory && sentenceCategories && 
+        (currentCategory === 'constitution' || currentCategory === 'constitutionPreamble') && 
+        sentenceCategories[currentCategory] && sentenceCategories[currentCategory].koreanTranslations) {
+        const koreanText = sentenceCategories[currentCategory].koreanTranslations[currentSentenceIndex];
+        if (koreanText && sentenceDisplay) {
+            // 기존 한글 번역 요소가 있으면 제거
+            const existingTranslation = document.getElementById('koreanTranslation');
+            if (existingTranslation) {
+                existingTranslation.remove();
+            }
+            
+            // 새로운 한글 번역 요소 생성 및 삽입
+            const translationDiv = document.createElement('div');
+            translationDiv.id = 'koreanTranslation';
+            translationDiv.className = 'korean-translation';
+            translationDiv.innerHTML = escape(koreanText);
+            
+            // sentenceDisplay 다음에 삽입
+            sentenceDisplay.parentNode.insertBefore(translationDiv, sentenceDisplay.nextSibling);
+        }
+    } else if (!displayElement && sentenceDisplay) {
+        // 헌법 관련 카테고리가 아닐 때는 한글 번역 요소 제거
+        const existingTranslation = document.getElementById('koreanTranslation');
+        if (existingTranslation) {
+            existingTranslation.remove();
+        }
+    }
 } 
