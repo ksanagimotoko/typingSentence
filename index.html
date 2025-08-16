@@ -37,7 +37,8 @@ crossorigin="anonymous"></script>
             </div>
             <div class="nav-links">
                 <a href="/" class="active">타이핑 연습</a>
-                <a href="#" id="bookTypingMenu">책 타이핑</a>
+                <a href="#" id="bookTypingMenu">책 타이핑 연습</a>
+                <a href="#" id="bookTranscriptionMenu">책 필사</a>
                 <a href="guide.html">사용 가이드</a>
                 <a href="benefits.html">타이핑의 선한 영향력</a>
                 <a href="stats.html">나의 통계</a>
@@ -140,6 +141,63 @@ crossorigin="anonymous"></script>
         </div>
     </div>
 
+    <div class="book-transcription-area" id="bookTranscriptionArea" style="display: none;">
+        <div class="header">
+            <h1>책 필사</h1>
+            <p>좋아하는 책을 페이지별로 타이핑하여 필사해보세요!</p>
+        </div>
+        
+        <!-- 책 정보 입력 단계 -->
+        <div class="transcription-setup" id="transcriptionSetup">
+            <div class="setup-container">
+                <h2>필사할 책 정보를 입력하세요</h2>
+                <div class="input-group">
+                    <label for="bookTitleInput">책 제목</label>
+                    <input type="text" id="bookTitleInput" placeholder="예: 어린왕자" class="form-input">
+                </div>
+                <div class="input-group">
+                    <label for="bookAuthorInput">저자</label>
+                    <input type="text" id="bookAuthorInput" placeholder="예: 생텍쥐페리" class="form-input">
+                </div>
+                <div class="setup-buttons">
+                    <button id="loadTranscriptionBtn" class="btn btn-secondary">기존 필사 불러오기</button>
+                    <button id="startTranscriptionBtn" class="btn btn-primary">다음</button>
+                </div>
+                <input type="file" id="loadTranscriptionFile" accept=".json" style="display: none;">
+            </div>
+        </div>
+        
+        <!-- 필사 타이핑 단계 -->
+        <div class="transcription-typing" id="transcriptionTyping" style="display: none;">
+            <div class="transcription-header">
+                <button id="backToSetupBtn" class="back-btn">← 뒤로</button>
+                <div class="book-info">
+                    <h2 id="transcriptionBookTitle"></h2>
+                    <p id="transcriptionBookAuthor"></p>
+                </div>
+                <div class="page-info">
+                    <span id="currentPageNumber">1</span> 페이지
+                </div>
+            </div>
+            
+            <div class="sentence-input-container">
+                <h3>문장별 필사</h3>
+                <div class="sentence-list" id="sentenceList">
+                    <!-- 문장들이 여기에 동적으로 추가됩니다 -->
+                </div>
+                <div class="add-sentence-btn-container" style="display: none;">
+                    <button id="addSentenceBtn" class="btn btn-primary">다음 문장 입력하기</button>
+                </div>
+            </div>
+            
+            <div class="transcription-controls">
+                <button id="prevPageBtn" class="btn btn-secondary">← 이전 페이지</button>
+                <button id="saveTranscriptionBtn" class="btn btn-success">저장</button>
+                <button id="nextPageBtn" class="btn btn-primary">다음 페이지 →</button>
+            </div>
+        </div>
+    </div>
+
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
@@ -172,6 +230,7 @@ crossorigin="anonymous"></script>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+    <script src="transcription.js"></script>
     <script type="module" src="app.js"></script>
 </body>
 </html> 

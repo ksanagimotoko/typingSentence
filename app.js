@@ -1297,6 +1297,7 @@ async function bootstrap() {
 document.addEventListener('DOMContentLoaded', () => { 
     bootstrap().then(() => setTimeout(() => focusTypingInput(), 0));
     initializeBookTyping();
+    initializeBookTranscription();
 }); 
 
 function getCategoryIcon(key, level) {
@@ -2049,6 +2050,11 @@ function updateNavigationState(activeSection) {
         if (bookTypingMenu) {
             bookTypingMenu.classList.add('active');
         }
+    } else if (activeSection === 'bookTranscription') {
+        const bookTranscriptionMenu = document.getElementById('bookTranscriptionMenu');
+        if (bookTranscriptionMenu) {
+            bookTranscriptionMenu.classList.add('active');
+        }
     } else if (activeSection === 'typing') {
         const typingMenu = document.querySelector('.nav-links a[href="/"]');
         if (typingMenu) {
@@ -2061,13 +2067,17 @@ function backToTyping() {
     const categoryMenu = document.getElementById('categoryMenu');
     const typingArea = document.getElementById('typingArea');
     const bookTypingArea = document.getElementById('bookTypingArea');
+    const bookTranscriptionArea = document.getElementById('bookTranscriptionArea');
     
     categoryMenu.style.display = 'grid';
     typingArea.style.display = 'block';
-    bookTypingArea.style.display = 'none';
+    if (bookTypingArea) bookTypingArea.style.display = 'none';
+    if (bookTranscriptionArea) bookTranscriptionArea.style.display = 'none';
     
     // 책 테마 초기화
     resetBookTheme();
     
     updateNavigationState('typing');
-} 
+}
+
+ 
