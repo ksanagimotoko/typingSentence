@@ -1763,16 +1763,27 @@ function renderBookList() {
     
     bookList.innerHTML = '';
     
-    Object.keys(bookData).forEach(bookKey => {
+    // 책들을 level 순서로 정렬
+    const sortedBooks = Object.keys(bookData).sort((a, b) => {
+        const levelA = bookData[a].level || 999; // level이 없으면 맨 뒤로
+        const levelB = bookData[b].level || 999;
+        return levelA - levelB;
+    });
+    
+    sortedBooks.forEach(bookKey => {
         const book = bookData[bookKey];
         const bookCard = document.createElement('div');
         bookCard.className = 'book-card';
         
         const bookTitle = getBookTitle(bookKey);
         const bookDescription = getBookDescription(bookKey);
+        const level = book.level || '?';
         
         bookCard.innerHTML = `
-            <h3>${bookTitle}</h3>
+            <div class="book-card-header">
+                <h3>${bookTitle}</h3>
+                <span class="book-level">Level ${level}</span>
+            </div>
             <p>${bookDescription}</p>
         `;
         
@@ -1781,7 +1792,7 @@ function renderBookList() {
         });
         
         bookList.appendChild(bookCard);
-        console.log('Added book card for:', bookKey, 'Card element:', bookCard);
+        console.log('Added book card for:', bookKey, 'Level:', level, 'Card element:', bookCard);
         console.log('Book list children count:', bookList.children.length);
     });
 }
