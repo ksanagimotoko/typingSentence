@@ -12,6 +12,10 @@
     <meta property="og:url" content="https://www.typingbook.com">
     <title>타이핑 연습 - typingbook.com | 무료 온라인 타자 연습</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="alternate icon" href="favicon.svg">
+    
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>
@@ -164,6 +168,7 @@ crossorigin="anonymous"></script>
                     <button id="startTranscriptionBtn" class="btn btn-primary">다음</button>
                 </div>
                 <input type="file" id="loadTranscriptionFile" accept=".json" style="display: none;">
+                <input type="file" id="saveTranscriptionFile" accept=".json" style="display: none;" webkitdirectory>
             </div>
         </div>
         
@@ -178,6 +183,10 @@ crossorigin="anonymous"></script>
                 <div class="page-info">
                     <span id="currentPageNumber">1</span> 페이지
                 </div>
+            </div>
+            
+            <div id="autoSaveNotification" class="auto-save-notification" style="display: none;">
+                자동 저장 되었습니다.
             </div>
             
             <div class="sentence-input-container">
@@ -229,6 +238,12 @@ crossorigin="anonymous"></script>
     </footer>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    
+    <!-- 자동 저장 알림 -->
+    <div id="autoSaveNotification" class="auto-save-notification" style="display: none;">
+        <div class="heart-icon">❤️</div>
+        <div class="save-text">자동 저장 되었습니다</div>
+    </div>
 
     <script src="transcription.js"></script>
     <script type="module" src="app.js"></script>

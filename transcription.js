@@ -3,12 +3,15 @@ let transcriptionData = {
     title: '',
     author: '',
     pages: {},
-    currentPage: 1,
-    createdAt: new Date().toISOString(),
-    lastModified: new Date().toISOString()
+    currentPage: 1
+    // 불필요한 메타데이터 제거로 파일 크기 최적화
 };
 
 let currentSentenceCount = 0;
+
+// 메모리에서만 관리하는 저장 상태 (파일에 저장되지 않음)
+let hasBeenSaved = false;
+let savePath = null;
 
 // 책 필사 기능 초기화
 function initializeBookTranscription() {
@@ -75,12 +78,14 @@ function initializeBookTranscription() {
         });
     }
 
-    // 자동 저장 기능 (10초마다)
-    setInterval(() => {
-        if (document.getElementById('transcriptionTyping').style.display !== 'none') {
-            saveCurrentPageSentences();
-        }
-    }, 10000);
+    // 자동 저장 기능 비활성화 (10초마다)
+    // setInterval(() => {
+    //     if (document.getElementById('transcriptionTyping').style.display !== 'none') {
+    //         saveCurrentPageSentences();
+    //         // 자동 저장 시에도 파일에 저장 (이미 저장된 경로가 있는 경우)
+    //         autoSaveToFile();
+    //     }
+    // }, 10000);
 }
 
 function showBookTranscription() {
@@ -107,7 +112,10 @@ function showBookTranscription() {
         showTranscriptionSetup();
     }
     
-    updateNavigationState('bookTranscription');
+    // updateNavigationState 함수가 있는 경우에만 호출
+    if (typeof updateNavigationState === 'function') {
+        updateNavigationState('bookTranscription');
+    }
 }
 
 function showTranscriptionSetup() {
@@ -216,11 +224,11 @@ function saveCurrentPageSentences() {
     
     transcriptionData.pages[transcriptionData.currentPage] = {
         sentences: sentences,
-        liked: liked,
-        lastModified: new Date().toISOString()
+        liked: liked
+        // lastModified 제거로 파일 크기 최적화
     };
     
-    transcriptionData.lastModified = new Date().toISOString();
+    // lastModified 제거로 파일 크기 최적화
 }
 
 function addNewSentence() {
@@ -328,22 +336,48 @@ function addSentenceToDOM(text, number, isLiked = false) {
     }
 }
 
-function saveTranscription() {
+async function saveTranscription() {
     saveCurrentPageSentences();
     
-    const dataStr = JSON.stringify(transcriptionData, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${transcriptionData.title}_필사_${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    alert('필사 데이터가 저장되었습니다!');
+    // 한 번도 저장된 적이 없으면 기본 파일명으로 저장
+    if (!hasBeenSaved) {
+        // 기본 파일명 생성
+        const defaultFileName = `${transcriptionData.title}_필사_${new Date().toISOString().split('T')[0]}.json`;
+        
+        // 파일 다운로드
+        const dataStr = JSON.stringify(transcriptionData, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = defaultFileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // 저장 상태 업데이트 (메모리에서만 관리)
+        hasBeenSaved = true;
+        savePath = defaultFileName;
+    } else {
+        // 이미 저장된 적이 있으면 같은 파일명으로 다운로드
+        // 브라우저 보안 정책상 덮어쓰기는 불가능하지만, 같은 이름으로 다운로드
+        const dataStr = JSON.stringify(transcriptionData, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = savePath; // 첫 저장 시 선택한 파일명 사용
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // 사용자에게 안내
+        console.log(`파일이 ${savePath}로 다운로드되었습니다. 기존 파일을 덮어쓰려면 수동으로 교체해주세요.`);
+    }
 }
 
 function loadTranscriptionFromFile(event) {
@@ -358,8 +392,11 @@ function loadTranscriptionFromFile(event) {
             // 데이터 검증
             if (loadedData.title && loadedData.author && loadedData.pages) {
                 transcriptionData = {
-                    ...loadedData,
-                    lastModified: new Date().toISOString()
+                    title: loadedData.title,
+                    author: loadedData.author,
+                    pages: loadedData.pages,
+                    currentPage: loadedData.currentPage || 1
+                    // 불필요한 메타데이터 제거
                 };
                 
                 // 입력 필드 업데이트
@@ -421,5 +458,64 @@ function reorderSentenceNumbers() {
         }
     });
 }
+
+// 자동 저장 알림 표시 함수
+function showAutoSaveNotification() {
+    const notification = document.getElementById('autoSaveNotification');
+    if (notification) {
+        // 알림 표시
+        notification.style.display = 'block';
+        notification.classList.add('show');
+        
+        // 1초 후 자동으로 숨기기
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 300);
+        }, 1000);
+    }
+}
+
+// 자동 저장 시 파일에 저장하는 함수
+function autoSaveToFile() {
+    // 이미 저장된 경로가 있는 경우에만 파일에 저장
+    if (hasBeenSaved && savePath) {
+        const dataStr = JSON.stringify(transcriptionData, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = savePath;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+}
+
+// 초기 파일 자동 저장 함수 (사용하지 않음 - 제거됨)
+// function autoSaveInitialFile() {
+//     // 기본 파일명 생성
+//     const defaultFileName = `${transcriptionData.title}_필사_${new Date().toISOString().split('T')[0]}.json`;
+//     
+//     // 파일 다운로드
+//     const dataStr = JSON.stringify(transcriptionData, null, 2);
+//     const blob = new Blob([dataStr], { type: 'application/json' });
+//     const url = URL.createObjectURL(blob);
+//     
+//     const a = document.createElement('a');
+//     a.href = url;
+//     a.download = defaultFileName;
+//     document.body.appendChild(a);
+//     a.click();
+//     document.body.removeChild(a);
+//     URL.revokeObjectURL(url);
+//     
+//     // 저장 상태 업데이트 (메모리에서만 관리)
+//     hasBeenSaved = true;
+//     savePath = defaultFileName;
+// }
 
  
