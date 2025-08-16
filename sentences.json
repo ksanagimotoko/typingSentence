@@ -1,4 +1,16 @@
 {
+  "fingerExercise": {
+    "level": 0.5,
+    "name": "검지 중지 약지 애기 손가락 연습",
+    "description": "각 손가락별로 담당하는 키들을 집중적으로 연습합니다",
+    "sentences": [
+      "jj ff hh gg fg hj uu rr yy tt gg hh vv nn vv nn mm cc  vv nn gg hh rr uu tt yy ty gh vn gg hh gh gh hg hg",
+      "kk dd ii ee ,, xx ik ed xx ,, x, x, x, x, x, x, x, ie ie ei ei",
+      "www ooo wo wo wo wo ooo www ow ow ow ow ow",
+      "aaa ;;; a; a; a; a; ;;;; aaaa ;a ;a ;a ;a ;a ;a ;a ;a",
+      "zzz /// z/ z/ qqq ppp qp qp qp pq pq pq"
+    ]
+  },
   "middleRowLetters": {
     "level": 1,
     "name": "중간 행 알파벳 연습",
