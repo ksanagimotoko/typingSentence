@@ -167,68 +167,68 @@ function showTranscriptionTyping() {
 }
 
 function loadPageSentences() {
-    const currentPageNumber = document.getElementById('currentPageNumber');
     const sentenceList = document.getElementById('sentenceList');
-    const addSentenceBtn = document.getElementById('addSentenceBtn');
-    const prevPageBtn = document.getElementById('prevPageBtn');
-    
-    if (currentPageNumber) currentPageNumber.textContent = transcriptionData.currentPage;
-    
-    // 현재 페이지 데이터 가져오기
-    const pageData = transcriptionData.pages[transcriptionData.currentPage] || {
-        sentences: [],
-        liked: []
-    };
-    
-    // 문장 목록 초기화
-    if (sentenceList) {
-        sentenceList.innerHTML = '';
-        currentSentenceCount = 0;
-        
-        if (pageData.sentences && pageData.sentences.length > 0) {
-            pageData.sentences.forEach((sentence, index) => {
-                const isLiked = pageData.liked && pageData.liked[index];
-                addSentenceToDOM(sentence, index + 1, isLiked);
-            });
-            currentSentenceCount = pageData.sentences.length;
-            
-            // 버튼 텍스트 변경
-            if (addSentenceBtn) addSentenceBtn.textContent = '다음 문장 입력하기';
-        } else {
-            // 첫 문장 입력 필드 바로 생성
-            currentSentenceCount = 0;
-            addNewSentence();
-        }
+    if (!sentenceList) {
+        console.error('sentenceList 요소를 찾을 수 없습니다.');
+        return;
     }
     
-    // 이전 페이지 버튼 활성화/비활성화
-    if (prevPageBtn) {
-        prevPageBtn.disabled = transcriptionData.currentPage <= 1;
+    console.log('loadPageSentences 시작 - sentenceList:', sentenceList);
+    
+    // 기존 문장들 제거
+    sentenceList.innerHTML = '';
+    currentSentenceCount = 0;
+    
+    const currentPage = transcriptionData.currentPage;
+    const pageData = transcriptionData.pages[currentPage];
+    
+    console.log('현재 페이지:', currentPage, '페이지 데이터:', pageData);
+    
+    if (pageData && pageData.sentences && pageData.sentences.length > 0) {
+        // 기존 문장들 로드
+        console.log('기존 문장들 로드 시작:', pageData.sentences.length, '개');
+        pageData.sentences.forEach((sentence, index) => {
+            const isLiked = pageData.liked && pageData.liked[index] === 1;
+            console.log(`문장 ${index + 1} 로드:`, sentence, '좋아요:', isLiked);
+            addSentenceToDOM(sentence, pageData.liked && pageData.liked[index] === 1 ? 1 : 0, index + 1);
+        });
+        currentSentenceCount = pageData.sentences.length;
+        console.log('기존 문장들 로드 완료, currentSentenceCount:', currentSentenceCount);
+    } else {
+        // 빈 문장 입력 필드 추가
+        console.log('빈 문장 입력 필드 추가');
+        addSentenceToDOM('', 0, 1);
+        currentSentenceCount = 1;
+        console.log('빈 문장 입력 필드 추가 완료, currentSentenceCount:', currentSentenceCount);
     }
+    
+    console.log('최종 sentenceList 자식 요소 수:', sentenceList.children.length);
 }
 
 function saveCurrentPageSentences() {
-    const sentenceItems = document.querySelectorAll('.sentence-item');
+    const currentPage = transcriptionData.currentPage;
+    const sentenceInputs = document.querySelectorAll('.sentence-input');
+    const likeBtns = document.querySelectorAll('.like-btn');
+    
     const sentences = [];
     const liked = [];
     
-    sentenceItems.forEach(item => {
-        const input = item.querySelector('.sentence-input');
-        const likeBtn = item.querySelector('.like-btn');
-        
+    sentenceInputs.forEach((input, index) => {
         if (input && input.value.trim()) {
             sentences.push(input.value.trim());
-            liked.push(likeBtn && likeBtn.classList.contains('liked'));
+            // 좋아요 상태를 1/0으로 저장
+            const isLiked = likeBtns[index] && likeBtns[index].innerHTML === '❤️';
+            liked.push(isLiked ? 1 : 0);
         }
     });
     
-    transcriptionData.pages[transcriptionData.currentPage] = {
+    // 현재 페이지 데이터 저장
+    transcriptionData.pages[currentPage] = {
         sentences: sentences,
         liked: liked
-        // lastModified 제거로 파일 크기 최적화
     };
     
-    // lastModified 제거로 파일 크기 최적화
+    console.log(`페이지 ${currentPage} 저장 완료:`, transcriptionData.pages[currentPage]);
 }
 
 function addNewSentence() {
@@ -237,7 +237,7 @@ function addNewSentence() {
     if (!sentenceList) return;
     
     currentSentenceCount++;
-    addSentenceToDOM('', currentSentenceCount, false);
+    addSentenceToDOM('', 0, currentSentenceCount);
     
     // 새로 추가된 입력 필드에 포커스
     const newInput = sentenceList.querySelector('.sentence-item:last-child .sentence-input');
@@ -247,81 +247,111 @@ function addNewSentence() {
     }
 }
 
-function addSentenceToDOM(text, number, isLiked = false) {
+function addSentenceToDOM(sentenceText = '', isLiked = 0, sentenceNumber = null) {
     const sentenceList = document.getElementById('sentenceList');
-    if (!sentenceList) return;
+    if (!sentenceList) {
+        console.error('addSentenceToDOM: sentenceList 요소를 찾을 수 없습니다.');
+        return;
+    }
+    
+    console.log('addSentenceToDOM 시작:', { sentenceText, isLiked, sentenceNumber });
     
     const sentenceItem = document.createElement('div');
-    sentenceItem.className = `sentence-item${isLiked ? ' liked' : ''}`;
+    sentenceItem.className = 'sentence-item';
+    if (isLiked === 1) sentenceItem.classList.add('liked');
     
-    sentenceItem.innerHTML = `
-        <div class="sentence-container">
-            <div class="sentence-content">
-                <div class="sentence-header">
-                    <span class="sentence-number">${number}번째 문장</span>
-                    <button class="delete-btn" title="문장 삭제">❌</button>
-                </div>
-                <textarea class="sentence-input" placeholder="문장을 입력하세요... 엔터를 입력하면 다음 문장을 입력할 수 있습니다." rows="2">${text}</textarea>
-            </div>
-            <button class="like-btn${isLiked ? ' liked' : ''}" title="좋아요">❤️</button>
-        </div>
-    `;
+    const sentenceHeader = document.createElement('div');
+    sentenceHeader.className = 'sentence-header';
     
-    sentenceList.appendChild(sentenceItem);
+    const sentenceNumberDiv = document.createElement('div');
+    sentenceNumberDiv.className = 'sentence-number';
+    sentenceNumberDiv.textContent = sentenceNumber || (currentSentenceCount + 1);
     
-    const input = sentenceItem.querySelector('.sentence-input');
-    const likeBtn = sentenceItem.querySelector('.like-btn');
-    const deleteBtn = sentenceItem.querySelector('.delete-btn');
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.textContent = '삭제';
     
-    // 입력 완료 시 스타일 변경
+    sentenceHeader.appendChild(sentenceNumberDiv);
+    sentenceHeader.appendChild(deleteBtn);
+    
+    const sentenceContainer = document.createElement('div');
+    sentenceContainer.className = 'sentence-container';
+    
+    const sentenceContent = document.createElement('div');
+    sentenceContent.className = 'sentence-content';
+    
+    const input = document.createElement('textarea');
+    input.className = 'sentence-input';
+    input.placeholder = '문장을 입력하세요...';
+    input.value = sentenceText;
+    
+    console.log('input 요소 생성 완료:', input);
+    
+    // 한국어 IME 입력 처리
+    let isComposing = false;
+    
+    input.addEventListener('compositionstart', () => {
+        isComposing = true;
+    });
+    
+    input.addEventListener('compositionend', () => {
+        isComposing = false;
+    });
+    
+    // 입력 이벤트 처리
     input.addEventListener('input', function() {
+        // 자동 높이 조절
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+        
+        // 완료 상태 표시
         if (this.value.trim()) {
             this.classList.add('completed');
         } else {
             this.classList.remove('completed');
         }
         
-        // 자동 높이 조절
-        this.style.height = 'auto';
-        this.style.height = this.scrollHeight + 'px';
-    });
-    
-    // 한글 IME 조합 상태 추적
-    let isComposing = false;
-    
-    input.addEventListener('compositionstart', function() {
-        isComposing = true;
-    });
-    
-    input.addEventListener('compositionend', function() {
-        isComposing = false;
+        // 현재 페이지 문장 저장
+        saveCurrentPageSentences();
     });
     
     // Enter 키로 새 문장 추가 (마지막 문장에서만)
     input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
-            e.preventDefault();
-            if (this.value.trim()) {
-                // 현재 문장이 마지막 문장인지 확인
-                const currentSentenceItem = this.closest('.sentence-item');
-                const sentenceItems = document.querySelectorAll('.sentence-item');
-                const isLastSentence = currentSentenceItem === sentenceItems[sentenceItems.length - 1];
-                
-                if (isLastSentence) {
-                    addNewSentence();
-                }
+        if (e.key === 'Enter' && !isComposing) {
+            const sentenceItems = document.querySelectorAll('.sentence-item');
+            const isLastSentence = this.closest('.sentence-item') === sentenceItems[sentenceItems.length - 1];
+            
+            if (isLastSentence) {
+                e.preventDefault();
+                addNewSentence();
             }
         }
     });
     
+    const likeBtn = document.createElement('button');
+    likeBtn.className = 'like-btn';
+    likeBtn.innerHTML = isLiked === 1 ? '❤️' : '🤍';
+    
     // 좋아요 버튼 이벤트
     likeBtn.addEventListener('click', function() {
-        this.classList.toggle('liked');
+        const isLiked = this.innerHTML === '❤️';
+        this.innerHTML = isLiked ? '🤍' : '❤️';
+        
+        // 부모 요소의 liked 클래스 토글
+        const sentenceItem = this.closest('.sentence-item');
         sentenceItem.classList.toggle('liked');
         
         // 데이터 저장
         saveCurrentPageSentences();
     });
+    
+    sentenceContent.appendChild(input);
+    sentenceContent.appendChild(likeBtn);
+    
+    sentenceContainer.appendChild(sentenceContent);
+    
+    sentenceItem.appendChild(sentenceHeader);
+    sentenceItem.appendChild(sentenceContainer);
     
     // 삭제 버튼 이벤트
     deleteBtn.addEventListener('click', function() {
@@ -329,11 +359,17 @@ function addSentenceToDOM(text, number, isLiked = false) {
     });
     
     // 초기 높이 설정
-    if (text) {
+    if (sentenceText) {
         input.style.height = 'auto';
         input.style.height = input.scrollHeight + 'px';
         input.classList.add('completed');
     }
+    
+    // sentenceList에 추가
+    console.log('sentenceList에 추가 전 자식 요소 수:', sentenceList.children.length);
+    sentenceList.appendChild(sentenceItem);
+    console.log('sentenceList에 추가 완료, 자식 요소 수:', sentenceList.children.length);
+    console.log('생성된 sentenceItem:', sentenceItem);
 }
 
 async function saveTranscription() {
@@ -396,7 +432,6 @@ function loadTranscriptionFromFile(event) {
                     author: loadedData.author,
                     pages: loadedData.pages,
                     currentPage: loadedData.currentPage || 1
-                    // 불필요한 메타데이터 제거
                 };
                 
                 // 입력 필드 업데이트
@@ -406,7 +441,28 @@ function loadTranscriptionFromFile(event) {
                 if (bookTitleInput) bookTitleInput.value = transcriptionData.title;
                 if (bookAuthorInput) bookAuthorInput.value = transcriptionData.author;
                 
-                alert(`"${transcriptionData.title}" 필사 데이터를 불러왔습니다.`);
+                // 마지막 페이지 찾기
+                const pageKeys = Object.keys(transcriptionData.pages);
+                if (pageKeys.length > 0) {
+                    // 페이지 번호를 숫자로 변환하여 정렬
+                    const sortedPages = pageKeys
+                        .map(key => parseInt(key))
+                        .filter(num => !isNaN(num))
+                        .sort((a, b) => a - b);
+                    
+                    if (sortedPages.length > 0) {
+                        const lastPage = sortedPages[sortedPages.length - 1];
+                        transcriptionData.currentPage = lastPage;
+                        
+                        // 마지막 페이지의 문장들 로드
+                        loadPageSentences();
+                        
+                        // 타이핑 화면으로 전환
+                        showTranscriptionTyping();
+                        
+                        console.log(`"${transcriptionData.title}" 필사 데이터를 불러왔습니다. 마지막 페이지(${lastPage})로 이동했습니다.`);
+                    }
+                }
             } else {
                 alert('올바르지 않은 필사 파일 형식입니다.');
             }
@@ -454,7 +510,7 @@ function reorderSentenceNumbers() {
     sentenceItems.forEach((item, index) => {
         const numberSpan = item.querySelector('.sentence-number');
         if (numberSpan) {
-            numberSpan.textContent = `${index + 1}번째 문장`;
+            numberSpan.textContent = index + 1;
         }
     });
 }
