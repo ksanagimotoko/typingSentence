@@ -1,1 +1,49 @@
- 
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- 키보드 배경 -->
+  <rect x="2" y="8" width="28" height="16" rx="2" fill="#4a5568" stroke="#2d3748" stroke-width="1"/>
+  
+  <!-- 키보드 키들 -->
+  <rect x="4" y="10" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="7" y="10" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="10" y="10" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="13" y="10" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="16" y="10" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="19" y="10" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="22" y="10" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="25" y="10" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  
+  <rect x="4" y="13" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="7" y="13" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="10" y="13" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="13" y="13" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="16" y="13" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="19" y="13" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="22" y="13" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="25" y="13" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  
+  <rect x="4" y="16" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="7" y="16" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="10" y="16" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="13" y="16" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="16" y="16" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="19" y="16" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="22" y="16" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="25" y="16" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  
+  <rect x="4" y="19" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="7" y="19" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="10" y="19" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="13" y="19" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="16" y="19" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="19" y="19" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="22" y="19" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  <rect x="25" y="19" width="2" height="2" fill="#e2e8f0" rx="0.5"/>
+  
+  <!-- 스페이스바 -->
+  <rect x="6" y="22" width="20" height="1.5" fill="#cbd5e0" rx="0.5"/>
+  
+  <!-- 타이핑 효과 (점) -->
+  <circle cx="8" cy="6" r="1" fill="#4299e1"/>
+  <circle cx="12" cy="6" r="1" fill="#4299e1"/>
+  <circle cx="16" cy="6" r="1" fill="#4299e1"/>
+</svg> 
