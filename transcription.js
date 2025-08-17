@@ -197,13 +197,14 @@ function loadPageSentences() {
         console.log('기존 문장들 로드 시작:', pageData.sentences.length, '개');
         pageData.sentences.forEach((sentence, index) => {
             const isLiked = pageData.liked && pageData.liked[index] === 1;
-            console.log(`문장 ${index + 1} 로드:`, sentence, '좋아요:', isLiked);
-            addSentenceToDOM(sentence, pageData.liked && pageData.liked[index] === 1 ? 1 : 0, index + 1);
+            const sentenceNumber = index + 1;
+            console.log(`문장 ${sentenceNumber} 로드:`, sentence, '좋아요:', isLiked);
+            addSentenceToDOM(sentence, pageData.liked && pageData.liked[index] === 1 ? 1 : 0, sentenceNumber);
         });
         currentSentenceCount = pageData.sentences.length;
         console.log('기존 문장들 로드 완료, currentSentenceCount:', currentSentenceCount);
     } else {
-        // 빈 문장 입력 필드 추가
+        // 빈 문장 입력 필드 추가 (1번 문장)
         console.log('빈 문장 입력 필드 추가');
         addSentenceToDOM('', 0, 1);
         currentSentenceCount = 1;
@@ -304,14 +305,27 @@ function addSentenceToDOM(sentenceText = '', isLiked = 0, sentenceNumber = null)
     likeBtn.className = 'like-btn';
     likeBtn.innerHTML = isLiked === 1 ? '❤️' : '🤍';
     
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'delete-btn';
-    deleteBtn.textContent = '삭제';
-    
-    sentenceHeader.appendChild(sentenceNumberDiv);
-    sentenceHeader.appendChild(addBtn);
-    sentenceHeader.appendChild(likeBtn);
-    sentenceHeader.appendChild(deleteBtn);
+    // 1번 문장이 아닐 때만 삭제 버튼 생성
+    if (sentenceNumber !== 1) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.textContent = '삭제';
+        
+        sentenceHeader.appendChild(sentenceNumberDiv);
+        sentenceHeader.appendChild(addBtn);
+        sentenceHeader.appendChild(likeBtn);
+        sentenceHeader.appendChild(deleteBtn);
+        
+        // 삭제 버튼 이벤트
+        deleteBtn.addEventListener('click', function() {
+            deleteSentence(sentenceItem);
+        });
+    } else {
+        // 1번 문장일 때는 삭제 버튼 없이
+        sentenceHeader.appendChild(sentenceNumberDiv);
+        sentenceHeader.appendChild(addBtn);
+        sentenceHeader.appendChild(likeBtn);
+    }
     
     const sentenceContainer = document.createElement('div');
     sentenceContainer.className = 'sentence-container';
@@ -418,9 +432,9 @@ function addSentenceToDOM(sentenceText = '', isLiked = 0, sentenceNumber = null)
     sentenceItem.appendChild(sentenceContainer);
     
     // 삭제 버튼 이벤트
-    deleteBtn.addEventListener('click', function() {
-        deleteSentence(sentenceItem);
-    });
+    // deleteBtn.addEventListener('click', function() {
+    //     deleteSentence(sentenceItem);
+    // });
     
     // 초기 높이 설정
     if (sentenceText) {
@@ -457,6 +471,7 @@ function createNewSentenceItem() {
     likeBtn.className = 'like-btn';
     likeBtn.innerHTML = '🤍';
     
+    // 새로 생성되는 문장은 항상 1번이 아니므로 삭제 버튼 생성
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'delete-btn';
     deleteBtn.textContent = '삭제';
