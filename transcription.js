@@ -65,6 +65,7 @@ function initializeBookTranscription() {
             saveCurrentPageSentences();
             transcriptionData.currentPage++;
             loadPageSentences();
+            updatePageButtons();
         });
     }
 
@@ -74,6 +75,7 @@ function initializeBookTranscription() {
                 saveCurrentPageSentences();
                 transcriptionData.currentPage--;
                 loadPageSentences();
+                updatePageButtons();
             }
         });
     }
@@ -175,6 +177,12 @@ function loadPageSentences() {
     
     console.log('loadPageSentences 시작 - sentenceList:', sentenceList);
     
+    // 페이지 정보 업데이트
+    const currentPageNumber = document.getElementById('currentPageNumber');
+    if (currentPageNumber) {
+        currentPageNumber.textContent = transcriptionData.currentPage;
+    }
+    
     // 기존 문장들 제거
     sentenceList.innerHTML = '';
     currentSentenceCount = 0;
@@ -203,6 +211,26 @@ function loadPageSentences() {
     }
     
     console.log('최종 sentenceList 자식 요소 수:', sentenceList.children.length);
+    
+    // 페이지 버튼 상태 업데이트
+    updatePageButtons();
+}
+
+// 페이지 버튼 상태 업데이트 함수
+function updatePageButtons() {
+    const prevPageBtn = document.getElementById('prevPageBtn');
+    const nextPageBtn = document.getElementById('nextPageBtn');
+    
+    if (prevPageBtn) {
+        prevPageBtn.disabled = transcriptionData.currentPage <= 1;
+    }
+    
+    if (nextPageBtn) {
+        // 다음 페이지 버튼은 항상 활성화 (새 페이지 생성 가능)
+        nextPageBtn.disabled = false;
+    }
+    
+    console.log('페이지 버튼 상태 업데이트 완료 - 현재 페이지:', transcriptionData.currentPage);
 }
 
 function saveCurrentPageSentences() {
