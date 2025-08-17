@@ -295,11 +295,22 @@ function addSentenceToDOM(sentenceText = '', isLiked = 0, sentenceNumber = null)
     sentenceNumberDiv.className = 'sentence-number';
     sentenceNumberDiv.textContent = sentenceNumber || (currentSentenceCount + 1);
     
+    const addBtn = document.createElement('button');
+    addBtn.className = 'add-sentence-btn';
+    addBtn.innerHTML = '+';
+    addBtn.title = '새 문장 추가';
+    
+    const likeBtn = document.createElement('button');
+    likeBtn.className = 'like-btn';
+    likeBtn.innerHTML = isLiked === 1 ? '❤️' : '🤍';
+    
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'delete-btn';
     deleteBtn.textContent = '삭제';
     
     sentenceHeader.appendChild(sentenceNumberDiv);
+    sentenceHeader.appendChild(addBtn);
+    sentenceHeader.appendChild(likeBtn);
     sentenceHeader.appendChild(deleteBtn);
     
     const sentenceContainer = document.createElement('div');
@@ -356,9 +367,35 @@ function addSentenceToDOM(sentenceText = '', isLiked = 0, sentenceNumber = null)
         }
     });
     
-    const likeBtn = document.createElement('button');
-    likeBtn.className = 'like-btn';
-    likeBtn.innerHTML = isLiked === 1 ? '❤️' : '🤍';
+    // + 버튼 이벤트 (새 문장 추가)
+    addBtn.addEventListener('click', function() {
+        const currentSentenceItem = this.closest('.sentence-item');
+        const sentenceList = document.getElementById('sentenceList');
+        
+        if (currentSentenceItem && sentenceList) {
+            // 현재 문장 다음에 새 문장 추가
+            const newSentenceItem = createNewSentenceItem();
+            
+            // 현재 문장 다음에 삽입
+            currentSentenceItem.after(newSentenceItem);
+            
+            // 문장 번호 재정렬
+            reorderSentenceNumbers();
+            
+            // 새로 추가된 입력 필드에 포커스
+            const newInput = newSentenceItem.querySelector('.sentence-input');
+            if (newInput) {
+                newInput.focus();
+                newInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            // 현재 문장 수 업데이트
+            currentSentenceCount = sentenceList.querySelectorAll('.sentence-item').length;
+            
+            // 데이터 저장
+            saveCurrentPageSentences();
+        }
+    });
     
     // 좋아요 버튼 이벤트
     likeBtn.addEventListener('click', function() {
@@ -374,7 +411,6 @@ function addSentenceToDOM(sentenceText = '', isLiked = 0, sentenceNumber = null)
     });
     
     sentenceContent.appendChild(input);
-    sentenceContent.appendChild(likeBtn);
     
     sentenceContainer.appendChild(sentenceContent);
     
@@ -398,6 +434,145 @@ function addSentenceToDOM(sentenceText = '', isLiked = 0, sentenceNumber = null)
     sentenceList.appendChild(sentenceItem);
     console.log('sentenceList에 추가 완료, 자식 요소 수:', sentenceList.children.length);
     console.log('생성된 sentenceItem:', sentenceItem);
+}
+
+// 새로운 문장 아이템을 생성하는 함수
+function createNewSentenceItem() {
+    const sentenceItem = document.createElement('div');
+    sentenceItem.className = 'sentence-item';
+    
+    const sentenceHeader = document.createElement('div');
+    sentenceHeader.className = 'sentence-header';
+    
+    const sentenceNumberDiv = document.createElement('div');
+    sentenceNumberDiv.className = 'sentence-number';
+    sentenceNumberDiv.textContent = '새';
+    
+    const addBtn = document.createElement('button');
+    addBtn.className = 'add-sentence-btn';
+    addBtn.innerHTML = '+';
+    addBtn.title = '새 문장 추가';
+    
+    const likeBtn = document.createElement('button');
+    likeBtn.className = 'like-btn';
+    likeBtn.innerHTML = '🤍';
+    
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.textContent = '삭제';
+    
+    sentenceHeader.appendChild(sentenceNumberDiv);
+    sentenceHeader.appendChild(addBtn);
+    sentenceHeader.appendChild(likeBtn);
+    sentenceHeader.appendChild(deleteBtn);
+    
+    const sentenceContainer = document.createElement('div');
+    sentenceContainer.className = 'sentence-container';
+    
+    const sentenceContent = document.createElement('div');
+    sentenceContent.className = 'sentence-content';
+    
+    const input = document.createElement('textarea');
+    input.className = 'sentence-input';
+    input.placeholder = '문장을 입력하세요...';
+    
+    // 한국어 IME 입력 처리
+    let isComposing = false;
+    
+    input.addEventListener('compositionstart', () => {
+        isComposing = true;
+    });
+    
+    input.addEventListener('compositionend', () => {
+        isComposing = false;
+    });
+    
+    // 입력 이벤트 처리
+    input.addEventListener('input', function() {
+        // 자동 높이 조절
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+        
+        // 완료 상태 표시
+        if (this.value.trim()) {
+            this.classList.add('completed');
+        } else {
+            this.classList.remove('completed');
+        }
+        
+        // 현재 페이지 문장 저장
+        saveCurrentPageSentences();
+    });
+    
+    // Enter 키로 새 문장 추가 (마지막 문장에서만)
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !isComposing) {
+            const sentenceItems = document.querySelectorAll('.sentence-item');
+            const isLastSentence = this.closest('.sentence-item') === sentenceItems[sentenceItems.length - 1];
+            
+            if (isLastSentence) {
+                e.preventDefault();
+                addNewSentence();
+            }
+        }
+    });
+    
+    // + 버튼 이벤트 (새 문장 추가)
+    addBtn.addEventListener('click', function() {
+        const currentSentenceItem = this.closest('.sentence-item');
+        const sentenceList = document.getElementById('sentenceList');
+        
+        if (currentSentenceItem && sentenceList) {
+            // 현재 문장 다음에 새 문장 추가
+            const newSentenceItem = createNewSentenceItem();
+            
+            // 현재 문장 다음에 삽입
+            currentSentenceItem.after(newSentenceItem);
+            
+            // 문장 번호 재정렬
+            reorderSentenceNumbers();
+            
+            // 새로 추가된 입력 필드에 포커스
+            const newInput = newSentenceItem.querySelector('.sentence-input');
+            if (newInput) {
+                newInput.focus();
+                newInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            // 현재 문장 수 업데이트
+            currentSentenceCount = sentenceList.querySelectorAll('.sentence-item').length;
+            
+            // 데이터 저장
+            saveCurrentPageSentences();
+        }
+    });
+    
+    // 좋아요 버튼 이벤트
+    likeBtn.addEventListener('click', function() {
+        const isLiked = this.innerHTML === '❤️';
+        this.innerHTML = isLiked ? '🤍' : '❤️';
+        
+        // 부모 요소의 liked 클래스 토글
+        const sentenceItem = this.closest('.sentence-item');
+        sentenceItem.classList.toggle('liked');
+        
+        // 데이터 저장
+        saveCurrentPageSentences();
+    });
+    
+    sentenceContent.appendChild(input);
+    
+    sentenceContainer.appendChild(sentenceContent);
+    
+    sentenceItem.appendChild(sentenceHeader);
+    sentenceItem.appendChild(sentenceContainer);
+    
+    // 삭제 버튼 이벤트
+    deleteBtn.addEventListener('click', function() {
+        deleteSentence(sentenceItem);
+    });
+    
+    return sentenceItem;
 }
 
 async function saveTranscription() {
