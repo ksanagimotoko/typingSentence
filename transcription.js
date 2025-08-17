@@ -207,9 +207,10 @@ function loadPageSentences() {
         console.log('기존 문장들 로드 시작:', pageData.sentences.length, '개');
         pageData.sentences.forEach((sentence, index) => {
             const isLiked = pageData.liked && pageData.liked[index] === 1;
+            const difficulty = pageData.difficulties && pageData.difficulties[index] ? pageData.difficulties[index] : 0;
             const sentenceNumber = index + 1;
-            console.log(`문장 ${sentenceNumber} 로드:`, sentence, '좋아요:', isLiked);
-            addSentenceToDOM(sentence, pageData.liked && pageData.liked[index] === 1 ? 1 : 0, sentenceNumber);
+            console.log(`문장 ${sentenceNumber} 로드:`, sentence, '좋아요:', isLiked, '난이도:', difficulty);
+            addSentenceToDOM(sentence, pageData.liked && pageData.liked[index] === 1 ? 1 : 0, sentenceNumber, difficulty);
         });
         currentSentenceCount = pageData.sentences.length;
         console.log('기존 문장들 로드 완료, currentSentenceCount:', currentSentenceCount);
@@ -251,6 +252,7 @@ function saveCurrentPageSentences() {
     
     const sentences = [];
     const liked = [];
+    const difficulties = [];
     
     sentenceInputs.forEach((input, index) => {
         if (input && input.value.trim()) {
@@ -258,13 +260,20 @@ function saveCurrentPageSentences() {
             // 좋아요 상태를 1/0으로 저장
             const isLiked = likeBtns[index] && likeBtns[index].innerHTML === '❤️';
             liked.push(isLiked ? 1 : 0);
+            
+            // 난이도 저장 (선택되지 않은 경우 0)
+            const sentenceItem = input.closest('.sentence-item');
+            const activeDifficultyBtn = sentenceItem.querySelector('.difficulty-btn.active');
+            const difficulty = activeDifficultyBtn ? parseInt(activeDifficultyBtn.dataset.level) : 0;
+            difficulties.push(difficulty);
         }
     });
     
     // 현재 페이지 데이터 저장
     transcriptionData.pages[currentPage] = {
         sentences: sentences,
-        liked: liked
+        liked: liked,
+        difficulties: difficulties
     };
     
     console.log(`페이지 ${currentPage} 저장 완료:`, transcriptionData.pages[currentPage]);
@@ -276,7 +285,7 @@ function addNewSentence() {
     if (!sentenceList) return;
     
     currentSentenceCount++;
-    addSentenceToDOM('', 0, currentSentenceCount);
+    addSentenceToDOM('', 0, currentSentenceCount, 0);
     
     // 새로 추가된 입력 필드에 포커스
     const newInput = sentenceList.querySelector('.sentence-item:last-child .sentence-input');
@@ -286,7 +295,7 @@ function addNewSentence() {
     }
 }
 
-function addSentenceToDOM(sentenceText = '', isLiked = 0, sentenceNumber = null) {
+function addSentenceToDOM(sentenceText = '', isLiked = 0, sentenceNumber = null, difficulty = 0) {
     const sentenceList = document.getElementById('sentenceList');
     if (!sentenceList) {
         console.error('addSentenceToDOM: sentenceList 요소를 찾을 수 없습니다.');
@@ -315,6 +324,41 @@ function addSentenceToDOM(sentenceText = '', isLiked = 0, sentenceNumber = null)
     likeBtn.className = 'like-btn';
     likeBtn.innerHTML = isLiked === 1 ? '❤️' : '🤍';
     
+    // 난이도 선택 버튼들 생성
+    const difficultyContainer = document.createElement('div');
+    difficultyContainer.className = 'difficulty-container';
+    
+    for (let i = 1; i <= 5; i++) {
+        const difficultyBtn = document.createElement('button');
+        difficultyBtn.className = 'difficulty-btn';
+        difficultyBtn.textContent = i;
+        difficultyBtn.title = `난이도 ${i}`;
+        difficultyBtn.dataset.level = i;
+        
+        // 난이도 버튼 클릭 이벤트
+        difficultyBtn.addEventListener('click', function() {
+            // 같은 문장의 다른 난이도 버튼들 비활성화
+            const allDifficultyBtns = sentenceItem.querySelectorAll('.difficulty-btn');
+            allDifficultyBtns.forEach(btn => btn.classList.remove('active'));
+            
+            // 클릭된 버튼 활성화
+            this.classList.add('active');
+            
+            // 현재 페이지 문장 저장
+            saveCurrentPageSentences();
+        });
+        
+        difficultyContainer.appendChild(difficultyBtn);
+    }
+    
+    // 기존 난이도가 있다면 해당 버튼 활성화
+    if (difficulty > 0 && difficulty <= 5) {
+        const targetBtn = difficultyContainer.querySelector(`[data-level="${difficulty}"]`);
+        if (targetBtn) {
+            targetBtn.classList.add('active');
+        }
+    }
+    
     // 1번 문장이 아닐 때만 삭제 버튼 생성
     if (sentenceNumber !== 1) {
         const deleteBtn = document.createElement('button');
@@ -324,6 +368,7 @@ function addSentenceToDOM(sentenceText = '', isLiked = 0, sentenceNumber = null)
         sentenceHeader.appendChild(sentenceNumberDiv);
         sentenceHeader.appendChild(addBtn);
         sentenceHeader.appendChild(likeBtn);
+        sentenceHeader.appendChild(difficultyContainer);
         sentenceHeader.appendChild(deleteBtn);
         
         // 삭제 버튼 이벤트
@@ -335,6 +380,7 @@ function addSentenceToDOM(sentenceText = '', isLiked = 0, sentenceNumber = null)
         sentenceHeader.appendChild(sentenceNumberDiv);
         sentenceHeader.appendChild(addBtn);
         sentenceHeader.appendChild(likeBtn);
+        sentenceHeader.appendChild(difficultyContainer);
     }
     
     const sentenceContainer = document.createElement('div');
@@ -819,6 +865,16 @@ function printTranscription() {
                     sentenceText.className = 'sentence-text';
                     sentenceText.textContent = sentence;
                     
+                    // 난이도 정보 추가
+                    if (page.difficulties && page.difficulties[index] > 0) {
+                        const difficultyInfo = document.createElement('span');
+                        difficultyInfo.className = 'difficulty-info';
+                        difficultyInfo.textContent = ` [난이도: ${page.difficulties[index]}]`;
+                        difficultyInfo.style.color = '#007bff';
+                        difficultyInfo.style.fontSize = '0.9em';
+                        sentenceText.appendChild(difficultyInfo);
+                    }
+                    
                     sentenceItem.appendChild(sentenceNumber);
                     sentenceItem.appendChild(sentenceText);
                     pageContent.appendChild(sentenceItem);
@@ -921,6 +977,17 @@ function printLikedSentences() {
                 const sentenceText = document.createElement('span');
                 sentenceText.className = 'sentence-text';
                 sentenceText.textContent = item.sentence;
+                
+                // 난이도 정보 추가
+                const page = transcriptionData.pages[item.page];
+                if (page && page.difficulties && page.difficulties[item.originalIndex] > 0) {
+                    const difficultyInfo = document.createElement('span');
+                    difficultyInfo.className = 'difficulty-info';
+                    difficultyInfo.textContent = ` [난이도: ${page.difficulties[item.originalIndex]}]`;
+                    difficultyInfo.style.color = '#007bff';
+                    difficultyInfo.style.fontSize = '0.9em';
+                    sentenceText.appendChild(difficultyInfo);
+                }
                 
                 sentenceItem.appendChild(sentenceNumber);
                 sentenceItem.appendChild(sentenceText);

@@ -1182,6 +1182,46 @@ main {
     border-color: #dc3545;
 }
 
+/* 난이도 버튼 스타일 */
+.difficulty-container {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+}
+
+.difficulty-btn {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #ddd;
+    background: #f8f9fa;
+    color: #666;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.difficulty-btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.difficulty-btn.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+.difficulty-btn.active:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+}
+
 /* 프린트 전용 스타일 */
 @media print {
     body * {
