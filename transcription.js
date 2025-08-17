@@ -70,6 +70,19 @@ function initializeBookTranscription() {
         printLikedBtn.addEventListener('click', printLikedSentences);
     }
 
+    const difficultySelect = document.getElementById('difficultySelect');
+    const printDifficultyBtn = document.getElementById('printDifficultyBtn');
+    
+    if (difficultySelect && printDifficultyBtn) {
+        // 난이도 선택 시 프린트 버튼 활성화/비활성화
+        difficultySelect.addEventListener('change', function() {
+            printDifficultyBtn.disabled = !this.value;
+        });
+        
+        // 난이도별 프린트 버튼 클릭 이벤트
+        printDifficultyBtn.addEventListener('click', printDifficultySentences);
+    }
+
     if (nextPageBtn) {
         nextPageBtn.addEventListener('click', () => {
             saveCurrentPageSentences();
@@ -996,6 +1009,135 @@ function printLikedSentences() {
             
             printContent.appendChild(pageContent);
         });
+    }
+    
+    // 기존 프린트 컨텐츠가 있다면 제거
+    const existingPrintContent = document.querySelector('.print-content');
+    if (existingPrintContent) {
+        existingPrintContent.remove();
+    }
+    
+    // 새로운 프린트 컨텐츠를 body에 추가
+    document.body.appendChild(printContent);
+    
+    // 프린트 실행
+    window.print();
+    
+    // 프린트 후 프린트 컨텐츠 제거
+    setTimeout(() => {
+        if (printContent.parentNode) {
+            printContent.parentNode.removeChild(printContent);
+        }
+    }, 1000);
+}
+
+// 난이도별 문장 프린트하는 기능
+function printDifficultySentences() {
+    // 현재 저장된 문장들을 가져오기
+    saveCurrentPageSentences();
+    
+    const selectedDifficulty = document.getElementById('difficultySelect').value;
+    if (!selectedDifficulty) {
+        alert('난이도를 선택해주세요.');
+        return;
+    }
+    
+    // 프린트용 HTML 생성
+    const printContent = document.createElement('div');
+    printContent.className = 'print-content';
+    
+    // 제목과 저자 정보
+    const title = document.createElement('h1');
+    title.textContent = `${transcriptionData.title} - ${transcriptionData.author} (난이도 ${selectedDifficulty} 문장 모음)`;
+    printContent.appendChild(title);
+    
+    // 선택된 난이도의 문장들만 수집
+    const difficultySentences = [];
+    const pageNumbers = Object.keys(transcriptionData.pages).sort((a, b) => parseInt(a) - parseInt(b));
+    
+    pageNumbers.forEach(pageNum => {
+        const page = transcriptionData.pages[pageNum];
+        if (page && page.sentences && page.difficulties) {
+            page.sentences.forEach((sentence, index) => {
+                if (sentence.trim() && page.difficulties[index] === parseInt(selectedDifficulty)) {
+                    difficultySentences.push({
+                        page: pageNum,
+                        sentence: sentence,
+                        originalIndex: index
+                    });
+                }
+            });
+        }
+    });
+    
+    if (difficultySentences.length === 0) {
+        // 해당 난이도의 문장이 없는 경우
+        const noDifficultyMessage = document.createElement('div');
+        noDifficultyMessage.style.textAlign = 'center';
+        noDifficultyMessage.style.marginTop = '50px';
+        noDifficultyMessage.style.fontSize = '16pt';
+        noDifficultyMessage.style.color = '#666';
+        noDifficultyMessage.textContent = `난이도 ${selectedDifficulty}인 문장이 없습니다.`;
+        printContent.appendChild(noDifficultyMessage);
+    } else {
+        // 해당 난이도 문장들을 페이지별로 그룹화
+        const pageGroups = {};
+        difficultySentences.forEach(item => {
+            if (!pageGroups[item.page]) {
+                pageGroups[item.page] = [];
+            }
+            pageGroups[item.page].push(item);
+        });
+        
+        // 페이지별로 출력
+        Object.keys(pageGroups).sort((a, b) => parseInt(a) - parseInt(b)).forEach(pageNum => {
+            const pageContent = document.createElement('div');
+            pageContent.className = 'page-content';
+            
+            const pageTitle = document.createElement('h2');
+            pageTitle.textContent = `${pageNum}페이지`;
+            pageContent.appendChild(pageTitle);
+            
+            pageGroups[pageNum].forEach((item, index) => {
+                const sentenceItem = document.createElement('div');
+                sentenceItem.className = 'sentence-item';
+                
+                const sentenceNumber = document.createElement('span');
+                sentenceNumber.className = 'sentence-number';
+                sentenceNumber.textContent = `${index + 1}. `;
+                
+                const sentenceText = document.createElement('span');
+                sentenceText.className = 'sentence-text';
+                sentenceText.textContent = item.sentence;
+                
+                // 난이도 정보 추가
+                const difficultyInfo = document.createElement('span');
+                difficultyInfo.className = 'difficulty-info';
+                difficultyInfo.textContent = ` [난이도: ${selectedDifficulty}]`;
+                difficultyInfo.style.color = '#dc3545';
+                difficultyInfo.style.fontWeight = 'bold';
+                difficultyInfo.style.fontSize = '0.9em';
+                sentenceText.appendChild(difficultyInfo);
+                
+                sentenceItem.appendChild(sentenceNumber);
+                sentenceItem.appendChild(sentenceText);
+                pageContent.appendChild(sentenceItem);
+            });
+            
+            printContent.appendChild(pageContent);
+        });
+        
+        // 총 문장 수 표시
+        const totalCount = document.createElement('div');
+        totalCount.style.textAlign = 'center';
+        totalCount.style.marginTop = '30px';
+        totalCount.style.padding = '15px';
+        totalCount.style.backgroundColor = '#f8f9fa';
+        totalCount.style.borderRadius = '8px';
+        totalCount.style.fontSize = '14pt';
+        totalCount.style.color = '#495057';
+        totalCount.textContent = `총 ${difficultySentences.length}개의 문장`;
+        printContent.appendChild(totalCount);
     }
     
     // 기존 프린트 컨텐츠가 있다면 제거

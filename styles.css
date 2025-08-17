@@ -1222,6 +1222,34 @@ main {
     border-color: #0056b3;
 }
 
+/* 난이도별 프린트 컨트롤 스타일 */
+.difficulty-print-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.difficulty-select {
+    padding: 8px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.difficulty-select:focus {
+    outline: none;
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.difficulty-select:hover {
+    border-color: #c82333;
+}
+
 /* 프린트 전용 스타일 */
 @media print {
     body * {
