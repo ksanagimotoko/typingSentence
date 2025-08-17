@@ -65,6 +65,11 @@ function initializeBookTranscription() {
         printTranscriptionBtn.addEventListener('click', printTranscription);
     }
 
+    const printLikedBtn = document.getElementById('printLikedBtn');
+    if (printLikedBtn) {
+        printLikedBtn.addEventListener('click', printLikedSentences);
+    }
+
     if (nextPageBtn) {
         nextPageBtn.addEventListener('click', () => {
             saveCurrentPageSentences();
@@ -774,7 +779,7 @@ function autoSaveToFile() {
     }
 }
 
-// 프린트 기능
+// 전체 프린트 기능
 function printTranscription() {
     // 현재 저장된 문장들을 가져오기
     saveCurrentPageSentences();
@@ -823,6 +828,108 @@ function printTranscription() {
             printContent.appendChild(pageContent);
         }
     });
+    
+    // 기존 프린트 컨텐츠가 있다면 제거
+    const existingPrintContent = document.querySelector('.print-content');
+    if (existingPrintContent) {
+        existingPrintContent.remove();
+    }
+    
+    // 새로운 프린트 컨텐츠를 body에 추가
+    document.body.appendChild(printContent);
+    
+    // 프린트 실행
+    window.print();
+    
+    // 프린트 후 프린트 컨텐츠 제거
+    setTimeout(() => {
+        if (printContent.parentNode) {
+            printContent.parentNode.removeChild(printContent);
+        }
+    }, 1000);
+}
+
+// 좋아요 문장만 프린트하는 기능
+function printLikedSentences() {
+    // 현재 저장된 문장들을 가져오기
+    saveCurrentPageSentences();
+    
+    // 프린트용 HTML 생성
+    const printContent = document.createElement('div');
+    printContent.className = 'print-content';
+    
+    // 제목과 저자 정보
+    const title = document.createElement('h1');
+    title.textContent = `${transcriptionData.title} - ${transcriptionData.author} (좋아요 문장 모음)`;
+    printContent.appendChild(title);
+    
+    // 좋아요 문장들만 수집
+    const likedSentences = [];
+    const pageNumbers = Object.keys(transcriptionData.pages).sort((a, b) => parseInt(a) - parseInt(b));
+    
+    pageNumbers.forEach(pageNum => {
+        const page = transcriptionData.pages[pageNum];
+        if (page && page.sentences && page.liked) {
+            page.sentences.forEach((sentence, index) => {
+                if (sentence.trim() && page.liked[index] === 1) {
+                    likedSentences.push({
+                        page: pageNum,
+                        sentence: sentence,
+                        originalIndex: index
+                    });
+                }
+            });
+        }
+    });
+    
+    if (likedSentences.length === 0) {
+        // 좋아요 문장이 없는 경우
+        const noLikedMessage = document.createElement('div');
+        noLikedMessage.style.textAlign = 'center';
+        noLikedMessage.style.marginTop = '50px';
+        noLikedMessage.style.fontSize = '16pt';
+        noLikedMessage.style.color = '#666';
+        noLikedMessage.textContent = '좋아요를 누른 문장이 없습니다.';
+        printContent.appendChild(noLikedMessage);
+    } else {
+        // 좋아요 문장들을 페이지별로 그룹화
+        const pageGroups = {};
+        likedSentences.forEach(item => {
+            if (!pageGroups[item.page]) {
+                pageGroups[item.page] = [];
+            }
+            pageGroups[item.page].push(item);
+        });
+        
+        // 페이지별로 출력
+        Object.keys(pageGroups).sort((a, b) => parseInt(a) - parseInt(b)).forEach(pageNum => {
+            const pageContent = document.createElement('div');
+            pageContent.className = 'page-content';
+            
+            const pageTitle = document.createElement('h2');
+            pageTitle.textContent = `${pageNum}페이지`;
+            pageContent.appendChild(pageTitle);
+            
+            pageGroups[pageNum].forEach((item, index) => {
+                const sentenceItem = document.createElement('div');
+                sentenceItem.className = 'sentence-item';
+                
+                const sentenceNumber = document.createElement('span');
+                sentenceNumber.className = 'sentence-number';
+                sentenceNumber.textContent = `${index + 1}. `;
+                
+                const sentenceText = document.createElement('span');
+                sentenceText.className = 'sentence-text';
+                sentenceText.textContent = item.sentence;
+                
+                sentenceItem.appendChild(sentenceNumber);
+                sentenceItem.appendChild(sentenceText);
+                pageContent.appendChild(sentenceItem);
+            });
+            
+            printContent.appendChild(pageContent);
+        });
+    }
     
     // 기존 프린트 컨텐츠가 있다면 제거
     const existingPrintContent = document.querySelector('.print-content');
