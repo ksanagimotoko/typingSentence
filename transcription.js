@@ -60,6 +60,11 @@ function initializeBookTranscription() {
         saveTranscriptionBtn.addEventListener('click', saveTranscription);
     }
 
+    const printTranscriptionBtn = document.getElementById('printTranscriptionBtn');
+    if (printTranscriptionBtn) {
+        printTranscriptionBtn.addEventListener('click', printTranscription);
+    }
+
     if (nextPageBtn) {
         nextPageBtn.addEventListener('click', () => {
             saveCurrentPageSentences();
@@ -767,6 +772,76 @@ function autoSaveToFile() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
+}
+
+// 프린트 기능
+function printTranscription() {
+    // 현재 저장된 문장들을 가져오기
+    saveCurrentPageSentences();
+    
+    // 프린트용 HTML 생성
+    const printContent = document.createElement('div');
+    printContent.className = 'print-content';
+    
+    // 제목과 저자 정보
+    const title = document.createElement('h1');
+    title.textContent = `${transcriptionData.title} - ${transcriptionData.author}`;
+    printContent.appendChild(title);
+    
+    // 페이지별 문장들 추가
+    const pageNumbers = Object.keys(transcriptionData.pages).sort((a, b) => parseInt(a) - parseInt(b));
+    
+    pageNumbers.forEach(pageNum => {
+        const page = transcriptionData.pages[pageNum];
+        if (page && page.sentences && page.sentences.length > 0) {
+            const pageContent = document.createElement('div');
+            pageContent.className = 'page-content';
+            
+            const pageTitle = document.createElement('h2');
+            pageTitle.textContent = `${pageNum}페이지`;
+            pageContent.appendChild(pageTitle);
+            
+            page.sentences.forEach((sentence, index) => {
+                if (sentence.trim()) {
+                    const sentenceItem = document.createElement('div');
+                    sentenceItem.className = 'sentence-item';
+                    
+                    const sentenceNumber = document.createElement('span');
+                    sentenceNumber.className = 'sentence-number';
+                    sentenceNumber.textContent = `${index + 1}. `;
+                    
+                    const sentenceText = document.createElement('span');
+                    sentenceText.className = 'sentence-text';
+                    sentenceText.textContent = sentence;
+                    
+                    sentenceItem.appendChild(sentenceNumber);
+                    sentenceItem.appendChild(sentenceText);
+                    pageContent.appendChild(sentenceItem);
+                }
+            });
+            
+            printContent.appendChild(pageContent);
+        }
+    });
+    
+    // 기존 프린트 컨텐츠가 있다면 제거
+    const existingPrintContent = document.querySelector('.print-content');
+    if (existingPrintContent) {
+        existingPrintContent.remove();
+    }
+    
+    // 새로운 프린트 컨텐츠를 body에 추가
+    document.body.appendChild(printContent);
+    
+    // 프린트 실행
+    window.print();
+    
+    // 프린트 후 프린트 컨텐츠 제거
+    setTimeout(() => {
+        if (printContent.parentNode) {
+            printContent.parentNode.removeChild(printContent);
+        }
+    }, 1000);
 }
 
 // 초기 파일 자동 저장 함수 (사용하지 않음 - 제거됨)

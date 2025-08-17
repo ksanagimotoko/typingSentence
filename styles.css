@@ -278,6 +278,16 @@ main {
     transform: translateY(-2px);
 }
 
+.btn-info {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-info:hover {
+    background: #138496;
+    transform: translateY(-2px);
+}
+
 .progress-bar {
     width: 100%;
     height: 8px;
@@ -1160,4 +1170,63 @@ main {
 
 .book-typing-input.incorrect {
     border-color: #dc3545;
+}
+
+/* 프린트 전용 스타일 */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    
+    .print-content, .print-content * {
+        visibility: visible;
+    }
+    
+    .print-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white;
+        color: black;
+        font-family: 'Times New Roman', serif;
+        font-size: 12pt;
+        line-height: 1.5;
+        padding: 20px;
+    }
+    
+    .print-content h1 {
+        font-size: 18pt;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-align: center;
+        border-bottom: 2px solid #000;
+        padding-bottom: 10px;
+    }
+    
+    .print-content h2 {
+        font-size: 14pt;
+        font-weight: bold;
+        margin: 20px 0 10px 0;
+        color: #333;
+    }
+    
+    .print-content .page-content {
+        margin-bottom: 30px;
+        page-break-inside: avoid;
+    }
+    
+    .print-content .sentence-item {
+        margin: 5px 0;
+        padding-left: 20px;
+    }
+    
+    .print-content .sentence-number {
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    
+    .print-content .sentence-text {
+        display: inline;
+    }
 } 
