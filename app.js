@@ -2061,6 +2061,8 @@ function updateNavigationState(activeSection) {
             typingMenu.classList.add('active');
         }
     }
+    
+    console.log('Navigation state updated:', activeSection);
 }
 
 function backToTyping() {

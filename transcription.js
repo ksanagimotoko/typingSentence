@@ -7,6 +7,33 @@ let transcriptionData = {
     // 불필요한 메타데이터 제거로 파일 크기 최적화
 };
 
+// 네비게이션 메뉴 활성화 상태 직접 업데이트 함수
+function updateNavigationStateDirectly(activeSection) {
+    const navLinks = document.querySelectorAll('.nav-links a');
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    if (activeSection === 'bookTyping') {
+        const bookTypingMenu = document.getElementById('bookTypingMenu');
+        if (bookTypingMenu) {
+            bookTypingMenu.classList.add('active');
+        }
+    } else if (activeSection === 'bookTranscription') {
+        const bookTranscriptionMenu = document.getElementById('bookTranscriptionMenu');
+        if (bookTranscriptionMenu) {
+            bookTranscriptionMenu.classList.add('active');
+        }
+    } else if (activeSection === 'typing') {
+        const typingMenu = document.querySelector('.nav-links a[href="/"]');
+        if (typingMenu) {
+            typingMenu.classList.add('active');
+        }
+    }
+    
+    console.log('Navigation state updated directly:', activeSection);
+}
+
 let currentSentenceCount = 0;
 
 // 메모리에서만 관리하는 저장 상태 (파일에 저장되지 않음)
@@ -137,10 +164,8 @@ function showBookTranscription() {
         showTranscriptionSetup();
     }
     
-    // updateNavigationState 함수가 있는 경우에만 호출
-    if (typeof updateNavigationState === 'function') {
-        updateNavigationState('bookTranscription');
-    }
+    // 네비게이션 메뉴 활성화 상태 직접 변경
+    updateNavigationStateDirectly('bookTranscription');
 }
 
 function showTranscriptionSetup() {
