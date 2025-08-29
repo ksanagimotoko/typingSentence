@@ -448,11 +448,13 @@ function backToMenu() {
     const categoryMenu = document.getElementById('categoryMenu');
     const typingArea = document.getElementById('typingArea');
     const bookTypingArea = document.getElementById('bookTypingArea');
+    const bookTranscriptionArea = document.getElementById('bookTranscriptionArea');
 
     categoryMenu.style.display = 'grid';
     typingArea.style.display = 'block';
     typingArea.classList.remove('active');
     bookTypingArea.style.display = 'none';
+    if (bookTranscriptionArea) bookTranscriptionArea.style.display = 'none';
     resetTyping();
     resetDefaultTheme();
     resetBookTheme(); // 책 테마도 초기화
@@ -1705,12 +1707,14 @@ function showBookTyping() {
     const categoryMenu = document.getElementById('categoryMenu');
     const typingArea = document.getElementById('typingArea');
     const bookTypingArea = document.getElementById('bookTypingArea');
+    const bookTranscriptionArea = document.getElementById('bookTranscriptionArea');
     const container = document.querySelector('.container');
     
     console.log('Elements found:', {
         categoryMenu: categoryMenu,
         typingArea: typingArea,
         bookTypingArea: bookTypingArea,
+        bookTranscriptionArea: bookTranscriptionArea,
         container: container
     });
     
@@ -1720,6 +1724,7 @@ function showBookTyping() {
         typingArea.style.display = 'none';
         typingArea.classList.remove('active');
     }
+    if (bookTranscriptionArea) bookTranscriptionArea.style.display = 'none';
     if (container) container.style.display = 'none';
     
     // 책 타이핑 영역만 표시
