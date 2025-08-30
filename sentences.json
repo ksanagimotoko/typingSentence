@@ -1,4 +1,14 @@
 {
+  "rightIndexFinger": {
+    "level": 0.4,
+    "name": "오른손 검지 연습",
+    "description": "오른손 검지가 담당하는 J, H, U, M, N, Y, T, R 키를 집중적으로 연습합니다",
+    "sentences": [
+      "jjj hhh uuu yyy nnn mmm",
+      "jh ju jy jn jm jj jh ju jy jn jm jn ju jy jj jh jm",
+      "juy juh jhy jnm jmn jmn jmm jhy juh jnj juj jhy jhj jnm jmm jmu"
+    ]
+  },
   "fingerExercise": {
     "level": 0.5,
     "name": "검지 중지 약지 애기 손가락 연습",
