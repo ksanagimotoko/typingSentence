@@ -1,4 +1,14 @@
 {
+  "leftIndexFinger": {
+    "level": 0.3,
+    "name": "왼손 검지 연습",
+    "description": "왼손 검지가 담당하는 F, G, R, T, V, B 키를 집중적으로 연습합니다",
+    "sentences": [
+      "fff ggg rrr ttt vvv bbb",
+      "fg fr ft fv fb ff fg fr ft fv fb ft fr fg ff fg fb",
+      "frt fgt fvt fbt frt fgt fvt fbt frt fgt fvt fbt frt fgt fvt fbt"
+    ]
+  },
   "rightIndexFinger": {
     "level": 0.4,
     "name": "오른손 검지 연습",
