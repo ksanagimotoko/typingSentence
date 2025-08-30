@@ -298,6 +298,10 @@ let sentenceCategories = window.sentenceCategories || {
 })();
 
 function getSortedKeysByLevel() {
+    if (!sentenceCategories || Object.keys(sentenceCategories).length === 0) {
+        return [];
+    }
+    
     const entries = Object.entries(sentenceCategories);
     const withLevels = [];
     for (let i = 0; i < entries.length; i++) {
@@ -395,6 +399,12 @@ function initializeCategoryMenu() {
     const typingArea = document.getElementById('typingArea');
 
     const orderedKeys = getSortedKeysByLevel();
+    
+    // sentenceCategories가 비어있으면 메뉴를 표시하지 않음
+    if (orderedKeys.length === 0) {
+        console.log('카테고리를 로드할 수 없습니다. sentences.json을 확인해주세요.');
+        return;
+    }
 
     for (let i = 0; i < orderedKeys.length; i++) {
         const key = orderedKeys[i];
@@ -961,20 +971,11 @@ function nextSentence() {
     }
 
     if (isLastSentence || shouldAutoAdvanceInTestMode()) {
-        const nextKey = getNextCategoryKey(currentCategory);
-        if (nextKey) {
-            // 현재 단계 통계 저장 후 다음 단계로 이동
-            saveSessionStats();
-            goToCategory(nextKey, true);
-            if (!isTyping) {
-                // 시작 버튼을 누르지 않았어도 다음 레벨 자동 시작
-                startTyping();
-            }
-            showToast(`${sentenceCategories[nextKey].name} 단계로 이동합니다.`)
-        } else {
-            saveSessionStats();
-            pauseTyping();
-        }
+        // 현재 단계 통계 저장
+        saveSessionStats();
+        
+        // 단계 완료 다이얼로그 표시
+        showLevelCompleteDialog();
     }
 }
 
@@ -1280,19 +1281,27 @@ document.querySelector('.controls').insertBefore(backButton, startBtn);
 
 async function loadSentences() {
     try {
+        console.log('sentences.json 로딩 시작...');
         const res = await fetch('sentences.json', { cache: 'no-store' });
         if (!res.ok) throw new Error('Failed to load sentences.json');
         const data = await res.json();
         sentenceCategories = data;
+        console.log('sentences.json 로딩 완료:', Object.keys(sentenceCategories).length, '개 카테고리');
     } catch (err) {
         console.error('[loadSentences] ', err);
+        // 기본 데이터로 폴백
+        console.log('기본 데이터로 폴백합니다.');
     }
 }
 
 async function bootstrap() {
+    console.log('부트스트랩 시작...');
     await loadSentences();
+    console.log('sentences.json 로딩 후:', Object.keys(sentenceCategories).length, '개 카테고리');
     await loadAsciiFrames();
+    console.log('카테고리 메뉴 초기화 시작...');
     initializeCategoryMenu();
+    console.log('부트스트랩 완료');
 }
 
 // 초기화
@@ -2087,4 +2096,141 @@ function backToTyping() {
     updateNavigationState('typing');
 }
 
- 
+// 단계 완료 다이얼로그 표시
+function showLevelCompleteDialog() {
+    const dialog = document.getElementById('levelCompleteDialog');
+    const completedLevelName = document.getElementById('completedLevelName');
+    const levelList = document.getElementById('levelList');
+    
+    // 완료된 단계 이름 표시
+    if (currentCategory && sentenceCategories[currentCategory]) {
+        completedLevelName.textContent = sentenceCategories[currentCategory].name;
+    }
+    
+    // 전체 단계 목록 생성
+    renderLevelList(levelList);
+    
+    // 다이얼로그 표시
+    dialog.style.display = 'flex';
+    
+    // 이벤트 리스너 등록
+    setupDialogEventListeners();
+}
+
+// 단계 목록 렌더링
+function renderLevelList(levelListElement) {
+    levelListElement.innerHTML = '';
+    
+    // 레벨별로 정렬된 단계 목록 생성
+    const sortedCategories = Object.entries(sentenceCategories)
+        .sort((a, b) => (a[1].level || 0) - (b[1].level || 0));
+    
+    sortedCategories.forEach(([key, category]) => {
+        const levelItem = document.createElement('div');
+        levelItem.className = 'level-item';
+        
+        // 현재 단계인지 확인
+        if (key === currentCategory) {
+            levelItem.classList.add('current');
+        }
+        
+        // 완료된 단계인지 확인 (로컬 스토리지에서)
+        const completedLevels = JSON.parse(localStorage.getItem('completedLevels') || '[]');
+        if (completedLevels.includes(key)) {
+            levelItem.classList.add('completed');
+        }
+        
+        // 잠긴 단계인지 확인 (이전 단계가 완료되지 않은 경우)
+        const currentIndex = sortedCategories.findIndex(([k]) => k === key);
+        const previousCompleted = currentIndex === 0 || 
+            sortedCategories.slice(0, currentIndex).some(([k]) => completedLevels.includes(k));
+        
+        if (!previousCompleted && key !== currentCategory) {
+            levelItem.classList.add('locked');
+        }
+        
+        levelItem.innerHTML = `
+            <div class="level-info">
+                <div class="level-name">${category.name}</div>
+                <div class="level-description">${category.description}</div>
+            </div>
+            <div class="level-status">
+                ${key === currentCategory ? '🎯' : 
+                  completedLevels.includes(key) ? '✅' : 
+                  !previousCompleted && key !== currentCategory ? '🔒' : '⏳'}
+            </div>
+        `;
+        
+        // 잠기지 않은 단계는 클릭 가능
+        if (!levelItem.classList.contains('locked')) {
+            levelItem.onclick = () => {
+                if (key !== currentCategory) {
+                    goToCategory(key, true);
+                    if (!isTyping) {
+                        startTyping();
+                    }
+                    showToast(`${category.name} 단계로 이동합니다.`);
+                    document.getElementById('levelCompleteDialog').style.display = 'none';
+                }
+            };
+        }
+        
+        levelListElement.appendChild(levelItem);
+    });
+}
+
+// 다이얼로그 이벤트 리스너 설정
+function setupDialogEventListeners() {
+    const retryBtn = document.getElementById('retryLevelBtn');
+    const nextBtn = document.getElementById('nextLevelBtn');
+    const dialog = document.getElementById('levelCompleteDialog');
+    
+    // 현재 단계 다시 하기
+    retryBtn.onclick = () => {
+        dialog.style.display = 'none';
+        resetTyping();
+        startTyping();
+    };
+    
+    // 다음 단계로 이동
+    nextBtn.onclick = () => {
+        const nextKey = getNextCategoryKey(currentCategory);
+        if (nextKey) {
+            // 현재 단계를 완료된 것으로 표시
+            markLevelAsCompleted(currentCategory);
+            
+            // 다음 단계로 이동
+            goToCategory(nextKey, true);
+            if (!isTyping) {
+                startTyping();
+            }
+            showToast(`${sentenceCategories[nextKey].name} 단계로 이동합니다.`);
+        }
+        
+        dialog.style.display = 'none';
+    };
+    
+    // 다이얼로그 외부 클릭 시 닫기
+    dialog.onclick = (e) => {
+        if (e.target === dialog) {
+            dialog.style.display = 'none';
+        }
+    };
+    
+    // ESC 키로 다이얼로그 닫기
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && dialog.style.display === 'flex') {
+            dialog.style.display = 'none';
+        }
+    });
+}
+
+// 단계 완료 표시
+function markLevelAsCompleted(levelKey) {
+    const completedLevels = JSON.parse(localStorage.getItem('completedLevels') || '[]');
+    if (!completedLevels.includes(levelKey)) {
+        completedLevels.push(levelKey);
+        localStorage.setItem('completedLevels', JSON.stringify(completedLevels));
+    }
+}
+

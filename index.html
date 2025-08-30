@@ -69,7 +69,6 @@ crossorigin="anonymous"></script>
 
         <div class="container">
         <div class="header">
-            <h1>타이핑 연습</h1>
             <p>문장을 따라 타이핑하여 속도와 정확도를 향상시켜보세요!</p>
             <div id="levelBadge" class="level-badge" aria-live="polite"></div>
         </div>
@@ -256,6 +255,28 @@ crossorigin="anonymous"></script>
     <div id="autoSaveNotification" class="auto-save-notification" style="display: none;">
         <div class="heart-icon">❤️</div>
         <div class="save-text">자동 저장 되었습니다</div>
+    </div>
+
+    <!-- 단계 완료 다이얼로그 -->
+    <div id="levelCompleteDialog" class="level-complete-dialog" style="display: none;">
+        <div class="dialog-content">
+            <div class="dialog-header">
+                <h2>🎉 단계 완료!</h2>
+                <p id="completedLevelName"></p>
+            </div>
+            
+            <div class="level-progress-section">
+                <h3>전체 단계 진행 상황</h3>
+                <div class="level-list" id="levelList">
+                    <!-- 단계 목록이 여기에 동적으로 추가됩니다 -->
+                </div>
+            </div>
+            
+            <div class="dialog-actions">
+                <button id="retryLevelBtn" class="btn btn-secondary">현재 단계 다시 하기</button>
+                <button id="nextLevelBtn" class="btn btn-primary">다음 단계로</button>
+            </div>
+        </div>
     </div>
 
     <script src="transcription.js"></script>
